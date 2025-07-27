@@ -186,54 +186,134 @@
 </head>
 <body>
   <div class="container" id="appContainer">
-    <!-- سيتم إنشاء المحتوى ديناميكياً -->
+    <h1>إرسال رسائل Discord تلقائي 24/7</h1>
+    
+    <div class="tab-buttons">
+      <button class="tab-button active" data-tab="sender">الإرسال</button>
+      <button class="tab-button" data-tab="settings">الإعدادات</button>
+      <button class="tab-button" data-tab="help">المساعدة</button>
+    </div>
+    
+    <div id="senderTab" class="tab-content active">
+      <div class="form-group">
+        <label for="channelId">معرف القناة:</label>
+        <input type="text" id="channelId" placeholder="123456789">
+      </div>
+      
+      <div class="form-group">
+        <label for="token">توكن الديسكورد:</label>
+        <input type="password" id="token" placeholder="توكن البوت أو الحساب">
+      </div>
+      
+      <div class="form-group">
+        <label for="message">محتوى الرسالة:</label>
+        <textarea id="message" placeholder="اكتب الرسالة هنا..."></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="delay">المدة بين الرسائل (ثواني):</label>
+        <input type="number" id="delay" value="5" min="1">
+      </div>
+      
+      <div class="form-group">
+        <label for="retries">عدد المحاولات عند الفشل:</label>
+        <select id="retries">
+          <option value="0">لا تحاول مجدداً</option>
+          <option value="1">محاولة واحدة</option>
+          <option value="2" selected>محاولتين</option>
+          <option value="3">3 محاولات</option>
+          <option value="5">5 محاولات</option>
+        </select>
+      </div>
+      
+      <div class="button-group">
+        <button id="startBtn">بدء الإرسال</button>
+        <button id="stopBtn" disabled>إيقاف</button>
+        <button id="copyBtn" disabled>نسخ رابط المراقبة</button>
+      </div>
+      
+      <div id="status" class="status-inactive">
+        الحالة: غير نشط
+      </div>
+      
+      <div id="monitorLinkContainer" style="display: none;">
+        <h3>رابط مراقبة الجلسة:</h3>
+        <div class="monitor-link" id="monitorLink"></div>
+        <small>انسخ هذا الرابط وأدخله في موقع المراقبة للحفاظ على الجلسة نشطة 24/7</small>
+      </div>
+    </div>
+    
+    <div id="settingsTab" class="tab-content">
+      <div class="settings-section">
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="autoResumeCheckbox" checked>
+            الاستئناف التلقائي عند إعادة التحميل
+          </label>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="enable24_7Checkbox" checked>
+            تفعيل الوضع 24/7 (يتطلب موقع مراقبة)
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="inactivityTime">وقت عدم النشاط قبل الإيقاف (دقائق):</label>
+          <input type="number" id="inactivityTime" value="15" min="5" max="120">
+        </div>
+      </div>
+    </div>
+    
+    <div id="helpTab" class="tab-content">
+      <div class="settings-section">
+        <h3>كيفية استخدام النظام 24/7</h3>
+        <p>لضمان عمل النظام 24/7 بدون توقف:</p>
+        <ol>
+          <li>قم بتفعيل خيار "الوضع 24/7" في تبويب الإعدادات</li>
+          <li>بعد بدء الإرسال، سيظهر رابط المراقبة</li>
+          <li>انسخ هذا الرابط وافتحه في:</li>
+          <ul>
+            <li>جهاز آخر أو متصفح مختلف</li>
+            <li>خدمة مراقبة مثل UptimeRobot</li>
+            <li>خادم VPS أو استضافة</li>
+          </ul>
+          <li>سيحافظ هذا على الجلسة نشطة حتى عند إغلاق المتصفح</li>
+        </ol>
+        
+        <h3>نصائح مهمة</h3>
+        <ul>
+          <li>استخدم توكن حساب ثانوي وليس حسابك الرئيسي</li>
+          <li>تجنب استخدام فترات زمنية قصيرة جداً بين الرسائل (أقل من 5 ثواني)</li>
+          <li>احتفظ بنسخة من التوكن والرسالة في مكان آمن</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div id="logs"></div>
   </div>
 
   <script>
-    // ==========================================
-    // نظام التطبيق التلقائي 24/7 - النسخة المحسنة
-    // ==========================================
-    
     class DiscordSender24_7 {
       constructor() {
         this.STATE_KEY = 'discordSender24_7State';
         this.CONFIG_KEY = 'discordSender24_7Config';
         this.SESSION_ID = this.generateSessionId();
-        this.worker = null;
+        this.workerUrl = 'worker.html';
+        this.workerWindow = null;
         this.isSending = false;
-        this.is24_7Mode = false;
-        this.appVersion = '4.0.0-24-7';
+        this.is24_7Mode = true;
+        this.autoResume = true;
+        this.appVersion = '5.0.0-24-7';
         this.monitorUrl = '';
         this.elements = {};
-        this.keepAliveInterval = null;
-        this.serverCheckInterval = null;
-        this.MAX_INACTIVITY = 15 * 60 * 1000; // 15 دقيقة
+        this.MAX_INACTIVITY = 15 * 60 * 1000;
         this.currentTab = 'sender';
         
-        this.initApp();
-      }
-      
-      // توليد معرف جلسة فريد
-      generateSessionId() {
-        return 'session-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-      }
-      
-      // إنشاء رابط مراقبة فريد
-      generateMonitorUrl() {
-        const baseUrl = window.location.href.split('?')[0];
-        return `${baseUrl}?monitor=${this.SESSION_ID}`;
-      }
-      
-      // تهيئة التطبيق
-      initApp() {
-        this.createUI();
+        this.initElements();
         this.loadConfig();
         this.setupEventListeners();
-        
         this.addLog(`تم تحميل DISCORD SENDER PRO 24/7 الإصدار ${this.appVersion}`, 'info');
-        this.addLog(`معرف الجلسة: ${this.SESSION_ID}`, 'info');
         
-        // التحقق من وضع المراقبة في URL
         const urlParams = new URLSearchParams(window.location.search);
         const monitorSession = urlParams.get('monitor');
         
@@ -244,118 +324,7 @@
         }
       }
       
-      // إنشاء واجهة المستخدم ديناميكياً
-      createUI() {
-        const container = document.getElementById('appContainer');
-        
-        container.innerHTML = `
-          <h1>إرسال رسائل Discord تلقائي 24/7</h1>
-          
-          <div class="tab-buttons">
-            <button class="tab-button ${this.currentTab === 'sender' ? 'active' : ''}" data-tab="sender">الإرسال</button>
-            <button class="tab-button ${this.currentTab === 'settings' ? 'active' : ''}" data-tab="settings">الإعدادات</button>
-            <button class="tab-button ${this.currentTab === 'help' ? 'active' : ''}" data-tab="help">المساعدة</button>
-          </div>
-          
-          <div id="senderTab" class="tab-content ${this.currentTab === 'sender' ? 'active' : ''}">
-            <div class="form-group">
-              <label for="channelId">معرف القناة:</label>
-              <input type="text" id="channelId" placeholder="123456789">
-            </div>
-            
-            <div class="form-group">
-              <label for="token">توكن الديسكورد:</label>
-              <input type="password" id="token" placeholder="توكن البوت أو الحساب">
-            </div>
-            
-            <div class="form-group">
-              <label for="message">محتوى الرسالة:</label>
-              <textarea id="message" placeholder="اكتب الرسالة هنا..."></textarea>
-            </div>
-            
-            <div class="form-group">
-              <label for="delay">المدة بين الرسائل (ثواني):</label>
-              <input type="number" id="delay" value="5" min="1">
-            </div>
-            
-            <div class="form-group">
-              <label for="retries">عدد المحاولات عند الفشل:</label>
-              <select id="retries">
-                <option value="0">لا تحاول مجدداً</option>
-                <option value="1">محاولة واحدة</option>
-                <option value="2" selected>محاولتين</option>
-                <option value="3">3 محاولات</option>
-                <option value="5">5 محاولات</option>
-              </select>
-            </div>
-            
-            <div class="button-group">
-              <button id="startBtn">بدء الإرسال</button>
-              <button id="stopBtn" disabled>إيقاف</button>
-              <button id="copyBtn" disabled>نسخ رابط المراقبة</button>
-            </div>
-            
-            <div id="status" class="status-inactive">
-              الحالة: غير نشط
-            </div>
-            
-            <div id="monitorLinkContainer" style="display: none;">
-              <h3>رابط مراقبة الجلسة:</h3>
-              <div class="monitor-link" id="monitorLink"></div>
-              <small>انسخ هذا الرابط وأدخله في موقع المراقبة للحفاظ على الجلسة نشطة 24/7</small>
-            </div>
-          </div>
-          
-          <div id="settingsTab" class="tab-content ${this.currentTab === 'settings' ? 'active' : ''}">
-            <div class="settings-section">
-              <div class="form-group">
-                <label>
-                  <input type="checkbox" id="autoResumeCheckbox" ${this.autoResume ? 'checked' : ''}>
-                  الاستئناف التلقائي عند إعادة التحميل
-                </label>
-              </div>
-              <div class="form-group">
-                <label>
-                  <input type="checkbox" id="enable24_7Checkbox">
-                  تفعيل الوضع 24/7 (يتطلب موقع مراقبة)
-                </label>
-              </div>
-              <div class="form-group">
-                <label for="inactivityTime">وقت عدم النشاط قبل الإيقاف (دقائق):</label>
-                <input type="number" id="inactivityTime" value="15" min="5" max="120">
-              </div>
-            </div>
-          </div>
-          
-          <div id="helpTab" class="tab-content ${this.currentTab === 'help' ? 'active' : ''}">
-            <div class="settings-section">
-              <h3>كيفية استخدام النظام 24/7</h3>
-              <p>لضمان عمل النظام 24/7 بدون توقف:</p>
-              <ol>
-                <li>قم بتفعيل خيار "الوضع 24/7" في تبويب الإعدادات</li>
-                <li>بعد بدء الإرسال، سيظهر رابط المراقبة</li>
-                <li>انسخ هذا الرابط وافتحه في:</li>
-                <ul>
-                  <li>جهاز آخر أو متصفح مختلف</li>
-                  <li>خدمة مراقبة مثل UptimeRobot</li>
-                  <li>خادم VPS أو استضافة</li>
-                </ul>
-                <li>سيحافظ هذا على الجلسة نشطة حتى عند إغلاق المتصفح</li>
-              </ol>
-              
-              <h3>نصائح مهمة</h3>
-              <ul>
-                <li>استخدم توكن حساب ثانوي وليس حسابك الرئيسي</li>
-                <li>تجنب استخدام فترات زمنية قصيرة جداً بين الرسائل (أقل من 5 ثواني)</li>
-                <li>احتفظ بنسخة من التوكن والرسالة في مكان آمن</li>
-              </ul>
-            </div>
-          </div>
-          
-          <div id="logs"></div>
-        `;
-        
-        // تخزين عناصر واجهة المستخدم
+      initElements() {
         this.elements = {
           startBtn: document.getElementById('startBtn'),
           stopBtn: document.getElementById('stopBtn'),
@@ -379,28 +348,29 @@
         };
       }
       
-      // تحميل الإعدادات
+      generateSessionId() {
+        return 'session-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      }
+      
+      generateMonitorUrl() {
+        const baseUrl = window.location.href.split('?')[0];
+        return `${baseUrl}?monitor=${this.SESSION_ID}`;
+      }
+      
       loadConfig() {
         const savedConfig = localStorage.getItem(this.CONFIG_KEY);
         if (savedConfig) {
           const config = JSON.parse(savedConfig);
           this.autoResume = config.autoResume !== false;
-          this.is24_7Mode = config.is24_7Mode || false;
+          this.is24_7Mode = config.is24_7Mode !== false;
           this.MAX_INACTIVITY = (config.inactivityTime || 15) * 60 * 1000;
           
-          if (this.elements.autoResumeCheckbox) {
-            this.elements.autoResumeCheckbox.checked = this.autoResume;
-          }
-          if (this.elements.enable24_7Checkbox) {
-            this.elements.enable24_7Checkbox.checked = this.is24_7Mode;
-          }
-          if (this.elements.inactivityTime) {
-            this.elements.inactivityTime.value = config.inactivityTime || 15;
-          }
+          this.elements.autoResumeCheckbox.checked = this.autoResume;
+          this.elements.enable24_7Checkbox.checked = this.is24_7Mode;
+          this.elements.inactivityTime.value = config.inactivityTime || 15;
         }
       }
       
-      // حفظ الإعدادات
       saveConfig() {
         localStorage.setItem(this.CONFIG_KEY, JSON.stringify({
           autoResume: this.autoResume,
@@ -411,7 +381,6 @@
         }));
       }
       
-      // محاولة استئناف الجلسة التلقائي
       attemptAutoResume() {
         const state = this.loadState();
         if (state && state.isActive) {
@@ -426,98 +395,29 @@
             setTimeout(() => {
               this.startSending();
             }, 1000);
-          } else {
-            this.addLog('تم اكتشاف جلسة نشطة. انتظر...', 'warning');
-            setTimeout(() => {
-              if (confirm('تم اكتشاف جلسة نشطة. هل تريد استئناف الإرسال؟')) {
-                this.startSending();
-              } else {
-                this.saveState({ isActive: false });
-              }
-            }, 1500);
           }
         }
       }
       
-      // تفعيل وضع المراقبة
       activateMonitorMode(sessionId) {
         this.addLog(`تم تفعيل وضع المراقبة للجلسة: ${sessionId}`, 'info');
-        
-        // إخفاء عناصر التحكم
         document.querySelector('.tab-buttons').style.display = 'none';
         document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
         document.querySelector('#logs').style.marginTop = '20px';
         
-        // عرض حالة المراقبة فقط
         this.elements.status.textContent = `وضع المراقبة: ${sessionId}`;
         this.elements.status.className = 'status-24-7';
         this.elements.status.style.display = 'block';
         
-        // نظام إبقاء الجلسة نشطة
-        this.startAdvancedKeepAliveSystem(sessionId);
+        this.startKeepAliveSystem();
       }
       
-      // نظام متقدم لإبقاء الجلسة نشطة
-      startAdvancedKeepAliveSystem(sessionId) {
-        // إلغاء أي مؤقتات سابقة
-        if (this.keepAliveInterval) clearInterval(this.keepAliveInterval);
-        
-        // إرسال نبضات حياة متقدمة
-        this.keepAliveInterval = setInterval(() => {
-          this.sendAdvancedPing(sessionId);
-        }, 2 * 60 * 1000); // كل دقيقتين
-        
-        // إرسال أول نبضة فوراً
-        this.sendAdvancedPing(sessionId);
-        
-        // إضافة مستمع لفحص التبويب النشط
-        document.addEventListener('visibilitychange', () => {
-          if (!document.hidden) {
-            this.sendAdvancedPing(sessionId);
-          }
-        });
-        
-        // إضافة مستمع لأحداث الماوس/لوحة المفاتيح
-        document.addEventListener('mousemove', () => this.sendAdvancedPing(sessionId));
-        document.addEventListener('keydown', () => this.sendAdvancedPing(sessionId));
-        
-        // بدء نظام التحقق من الخادم
-        this.setupServerPingSystem();
+      startKeepAliveSystem() {
+        setInterval(() => {
+          fetch(window.location.href, {cache: 'no-store'}).catch(() => {});
+        }, 2 * 60 * 1000);
       }
       
-      // نظام التحقق من الخادم
-      setupServerPingSystem() {
-        if (this.serverCheckInterval) clearInterval(this.serverCheckInterval);
-        
-        this.serverCheckInterval = setInterval(() => {
-          fetch('https://httpbin.org/get', {
-            cache: 'no-cache'
-          }).then(() => {
-            this.lastServerPing = Date.now();
-          }).catch(err => {
-            console.error('فشل في الاتصال بالخادم:', err);
-            this.addLog('فقدان الاتصال بالخادم، جارٍ إعادة المحاولة...', 'error');
-          });
-        }, 5 * 60 * 1000); // كل 5 دقائق
-      }
-      
-      // إرسال نبضة متقدمة
-      sendAdvancedPing(sessionId) {
-        const pingData = {
-          sessionId: sessionId,
-          timestamp: Date.now(),
-          userAgent: navigator.userAgent,
-          location: window.location.href
-        };
-        
-        // يمكنك هنا إرسال البيانات إلى خادمك إذا كان لديك واحد
-        console.log(`[${new Date().toLocaleTimeString()}] إرسال نبضة متقدمة`, pingData);
-        
-        // حفظ آخر نشاط
-        this.lastActivity = Date.now();
-      }
-      
-      // إعداد مستمعي الأحداث
       setupEventListeners() {
         this.elements.startBtn.addEventListener('click', () => this.startSending());
         this.elements.stopBtn.addEventListener('click', () => this.stopSending());
@@ -547,7 +447,6 @@
           this.addLog(`تم تحديث وقت عدم النشاط إلى ${e.target.value} دقائق`, 'info');
         });
         
-        // التحقق من التوكن عند التغيير
         this.elements.inputs.token.addEventListener('change', async () => {
           const token = this.elements.inputs.token.value.trim();
           if (token) {
@@ -557,31 +456,31 @@
           }
         });
         
-        // تبديل التبويبات
         this.elements.tabButtons.forEach(button => {
           button.addEventListener('click', () => {
             const tabName = button.getAttribute('data-tab');
             this.switchTab(tabName);
           });
         });
+        
+        window.addEventListener('message', (e) => {
+          if (e.data.type === 'LOG') {
+            this.addLog(e.data.message, e.data.level);
+          }
+        });
       }
       
-      // تبديل التبويبات
       switchTab(tabName) {
         this.currentTab = tabName;
-        
-        // تحديث أزرار التبويبات
         this.elements.tabButtons.forEach(button => {
           button.classList.toggle('active', button.getAttribute('data-tab') === tabName);
         });
         
-        // تحديث محتوى التبويبات
         this.elements.tabContents.forEach(content => {
           content.classList.toggle('active', content.id === `${tabName}Tab`);
         });
       }
       
-      // نسخ رابط المراقبة
       copyMonitorUrl() {
         navigator.clipboard.writeText(this.monitorUrl).then(() => {
           this.addLog('تم نسخ رابط المراقبة إلى الحافظة', 'success');
@@ -590,7 +489,6 @@
         });
       }
       
-      // عرض رابط المراقبة
       generateAndDisplayMonitorUrl() {
         this.monitorUrl = this.generateMonitorUrl();
         this.elements.monitorLink.textContent = this.monitorUrl;
@@ -601,127 +499,31 @@
         this.addLog(`انسخ هذا الرابط وأدخله في موقع المراقبة: ${this.monitorUrl}`, 'info');
       }
       
-      // بدء الإرسال
       startSending() {
         const { channelId, token, message, delay, retries } = this.elements.inputs;
         
-        // التحقق من المدخلات
         if (!channelId.value.trim() || !token.value.trim() || !message.value.trim()) {
           this.addLog('الرجاء ملء جميع الحقول المطلوبة', 'error');
           return;
         }
         
-        // إنشاء Web Worker
-        const workerCode = `
-          let isRunning = true;
-          const config = {
-            channelId: '${channelId.value.trim()}',
-            token: '${token.value.trim()}',
-            message: \`${message.value.trim()}\`,
-            delay: ${parseInt(delay.value) * 1000},
-            retries: ${parseInt(retries.value)}
-          };
-          
-          async function sendMessage() {
-            let attempts = 0;
-            let lastError;
-            
-            while (attempts <= config.retries) {
-              try {
-                const response = await fetch(
-                  \`https://discord.com/api/v9/channels/\${config.channelId}/messages\`,
-                  {
-                    method: 'POST',
-                    headers: {
-                      'Authorization': config.token,
-                      'Content-Type': 'application/json',
-                      'User-Agent': 'Mozilla/5.0'
-                    },
-                    body: JSON.stringify({
-                      content: config.message
-                    })
-                  }
-                );
-                
-                const data = await response.json();
-                
-                if (!response.ok) {
-                  throw new Error(data.message || \`HTTP \${response.status}\`);
-                }
-                
-                return {
-                  success: true,
-                  data: data
-                };
-              } catch (error) {
-                lastError = error;
-                attempts++;
-                if (attempts <= config.retries) {
-                  self.postMessage({
-                    type: 'LOG',
-                    message: \`محاولة \${attempts} من \${config.retries}...\`,
-                    level: 'warning'
-                  });
-                  await new Promise(r => setTimeout(r, 1000));
-                }
-              }
-            }
-            
-            throw lastError;
-          }
-          
-          async function mainLoop() {
-            while (isRunning) {
-              try {
-                const result = await sendMessage();
-                self.postMessage({
-                  type: 'LOG',
-                  message: 'تم إرسال الرسالة بنجاح',
-                  level: 'success',
-                  data: result.data
-                });
-              } catch (error) {
-                self.postMessage({
-                  type: 'LOG',
-                  message: \`فشل الإرسال: \${error.message}\`,
-                  level: 'error'
-                });
-              }
-              
-              await new Promise(r => setTimeout(r, config.delay));
-            }
-          }
-          
-          self.onmessage = function(e) {
-            if (e.data.type === 'STOP') {
-              isRunning = false;
-              self.postMessage({
-                type: 'LOG',
-                message: 'تم إيقاف الإرسال',
-                level: 'warning'
-              });
-            }
-          };
-          
-          mainLoop();
-        `;
+        this.workerWindow = window.open(this.workerUrl, `worker_${this.SESSION_ID}`, 
+          'width=400,height=300,left=100,top=100');
         
-        const blob = new Blob([workerCode], { type: 'application/javascript' });
-        this.worker = new Worker(URL.createObjectURL(blob));
-        
-        this.worker.onmessage = (e) => {
-          const { type, message, level = 'info', data } = e.data;
-          
-          if (type === 'LOG') {
-            this.addLog(message, level);
-            
-            if (level === 'error') {
-              console.error('Error:', message, data);
+        setTimeout(() => {
+          this.workerWindow.postMessage({
+            type: 'CONFIG',
+            config: {
+              channelId: channelId.value.trim(),
+              token: token.value.trim(),
+              message: message.value.trim(),
+              delay: parseInt(delay.value) * 1000,
+              retries: parseInt(retries.value),
+              sessionId: this.SESSION_ID
             }
-          }
-        };
+          }, '*');
+        }, 1000);
         
-        // حفظ الحالة
         this.saveState({
           channelId: channelId.value.trim(),
           token: token.value.trim(),
@@ -735,29 +537,16 @@
         this.updateUI(true);
         this.addLog('بدأ الإرسال التلقائي', 'success');
         
-        // إذا كان الوضع 24/7 مفعلاً، إنشاء رابط المراقبة
         if (this.is24_7Mode) {
           this.generateAndDisplayMonitorUrl();
-          this.startAdvancedKeepAliveSystem(this.SESSION_ID);
         }
       }
       
-      // إيقاف الإرسال
       stopSending() {
-        if (this.worker) {
-          this.worker.postMessage({ type: 'STOP' });
-          this.worker.terminate();
-          this.worker = null;
-        }
-        
-        if (this.keepAliveInterval) {
-          clearInterval(this.keepAliveInterval);
-          this.keepAliveInterval = null;
-        }
-        
-        if (this.serverCheckInterval) {
-          clearInterval(this.serverCheckInterval);
-          this.serverCheckInterval = null;
+        if (this.workerWindow) {
+          this.workerWindow.postMessage({ type: 'STOP' }, '*');
+          this.workerWindow.close();
+          this.workerWindow = null;
         }
         
         this.saveState({ isActive: false });
@@ -766,7 +555,6 @@
         this.addLog('تم إيقاف الإرسال', 'warning');
       }
       
-      // حفظ الحالة
       saveState(data) {
         localStorage.setItem(this.STATE_KEY, JSON.stringify({
           ...data,
@@ -775,16 +563,12 @@
         }));
       }
       
-      // تحميل الحالة
       loadState() {
         const saved = localStorage.getItem(this.STATE_KEY);
         return saved ? JSON.parse(saved) : null;
       }
       
-      // إضافة سجل
       addLog(message, type = 'info') {
-        if (!this.elements.logs) return;
-        
         const logEntry = document.createElement('div');
         logEntry.className = `log-entry ${type}`;
         logEntry.innerHTML = `
@@ -793,24 +577,19 @@
         `;
         this.elements.logs.prepend(logEntry);
         
-        // الحفاظ على عدد معقول من السجلات
         if (this.elements.logs.children.length > 50) {
           this.elements.logs.removeChild(this.elements.logs.lastChild);
         }
       }
       
-      // تحديث واجهة المستخدم
       updateUI(active) {
         this.isSending = active;
-        if (!this.elements.startBtn || !this.elements.stopBtn || !this.elements.status) return;
-        
         this.elements.startBtn.disabled = active;
         this.elements.stopBtn.disabled = !active;
         this.elements.status.textContent = `الحالة: ${active ? 'نشط' : 'غير نشط'}`;
         this.elements.status.className = active ? 'status-active' : 'status-inactive';
       }
       
-      // التحقق من صحة التوكن
       async validateToken(token) {
         try {
           const response = await fetch('https://discord.com/api/v9/users/@me', {
@@ -823,7 +602,6 @@
       }
     }
     
-    // بدء التطبيق عند تحميل الصفحة
     document.addEventListener('DOMContentLoaded', () => {
       new DiscordSender24_7();
     });
