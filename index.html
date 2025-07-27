@@ -18,7 +18,6 @@
       --text-secondary: #B3B3B3;
       --input-bg: #2D2D2D;
       --border-color: #444;
-      --neon-glow: 0 0 10px rgba(88, 101, 242, 0.8);
     }
 
     body {
@@ -27,9 +26,6 @@
       color: var(--text-color);
       margin: 0;
       padding: 20px;
-      background-image: 
-        radial-gradient(circle at 25% 25%, rgba(88, 101, 242, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 75% 75%, rgba(237, 66, 69, 0.15) 0%, transparent 50%);
     }
 
     .container {
@@ -40,84 +36,33 @@
       border-radius: 15px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
       border: 1px solid var(--border-color);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .container::before {
-      content: "";
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(
-        to bottom right,
-        transparent 45%,
-        rgba(255, 255, 255, 0.03) 50%,
-        transparent 55%
-      );
-      animation: shine 6s infinite linear;
-      z-index: 0;
-    }
-
-    @keyframes shine {
-      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
     }
 
     h1 {
       font-family: 'Orbitron', sans-serif;
       color: var(--primary-color);
       text-align: center;
-      font-size: 2.5rem;
       margin-bottom: 10px;
-      text-shadow: 0 0 10px rgba(88, 101, 242, 0.5);
-      letter-spacing: 2px;
-      position: relative;
-    }
-
-    .subtitle {
-      font-family: 'Orbitron', sans-serif;
-      text-align: center;
-      color: var(--text-secondary);
-      margin-bottom: 30px;
-      font-size: 1rem;
-      letter-spacing: 1px;
     }
 
     .form-group {
-      margin-bottom: 25px;
-      position: relative;
-      z-index: 1;
+      margin-bottom: 20px;
     }
 
     label {
       display: block;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       color: var(--text-secondary);
-      font-weight: 700;
-      font-size: 0.9rem;
-      letter-spacing: 1px;
     }
 
     input, textarea {
       width: 100%;
-      padding: 15px;
+      padding: 12px;
       background: var(--input-bg);
       border: 1px solid var(--border-color);
       color: var(--text-color);
       border-radius: 8px;
       font-size: 16px;
-      transition: all 0.3s;
-      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
-      font-family: 'Roboto', sans-serif;
-    }
-
-    input:focus, textarea:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.3), inset 0 2px 5px rgba(0, 0, 0, 0.2);
     }
 
     textarea {
@@ -132,44 +77,28 @@
     }
 
     button {
-      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      background: var(--primary-color);
       color: white;
       border: none;
-      padding: 15px 25px;
+      padding: 12px 20px;
       border-radius: 8px;
       cursor: pointer;
       font-size: 16px;
-      font-weight: bold;
-      transition: all 0.3s;
       flex: 1;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-family: 'Orbitron', sans-serif;
-      box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);
-      position: relative;
-      overflow: hidden;
+      transition: background 0.3s;
     }
 
     button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(88, 101, 242, 0.6);
+      background: var(--primary-dark);
     }
 
     button:disabled {
       background: #555;
       cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-      opacity: 0.7;
     }
 
     .btn-stop {
-      background: linear-gradient(135deg, var(--danger-color), #C0392B);
-      box-shadow: 0 4px 15px rgba(237, 66, 69, 0.4);
-    }
-
-    .btn-stop:hover {
-      box-shadow: 0 6px 20px rgba(237, 66, 69, 0.6);
+      background: var(--danger-color);
     }
 
     #status {
@@ -177,25 +106,7 @@
       border-radius: 8px;
       background: var(--input-bg);
       margin: 20px 0;
-      border-left: 4px solid var(--danger-color);
-      font-weight: bold;
-    }
-
-    #status.active {
-      border-left-color: var(--success-color);
-    }
-
-    .status-text {
-      font-family: 'Orbitron', sans-serif;
-      letter-spacing: 1px;
-    }
-
-    .active {
-      color: var(--success-color);
-    }
-
-    .inactive {
-      color: var(--danger-color);
+      text-align: center;
     }
 
     #logs {
@@ -205,104 +116,68 @@
       padding: 15px;
       border-radius: 8px;
       margin-top: 20px;
-      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
     }
 
     .log-entry {
       margin-bottom: 10px;
       padding: 10px;
       border-bottom: 1px solid var(--border-color);
-      font-family: 'Roboto Mono', monospace;
-      font-size: 14px;
     }
 
-    .log-time {
-      color: var(--text-secondary);
-      font-size: 0.8em;
-      margin-bottom: 5px;
-    }
-
-    .log-message {
-      margin-bottom: 5px;
-    }
-
-    .log-details {
-      background: rgba(0,0,0,0.3);
-      padding: 8px;
-      border-radius: 5px;
-      margin-top: 5px;
-      font-size: 0.9em;
-      white-space: pre-wrap;
-      word-break: break-all;
-    }
-
-    .success-log {
+    .success {
       color: var(--success-color);
     }
 
-    .error-log {
+    .error {
       color: var(--danger-color);
     }
 
     .warning {
-      background: rgba(250, 168, 26, 0.1);
-      padding: 15px;
-      border-radius: 8px;
+      color: var(--warning-color);
       margin-bottom: 20px;
-      border-left: 4px solid var(--warning-color);
-      color: var(--warning-color);
+      padding: 15px;
+      background: rgba(250, 168, 26, 0.1);
+      border-radius: 8px;
     }
 
-    .warning strong {
-      color: var(--warning-color);
+    #loader {
+      display: none;
+      text-align: center;
+      margin: 20px 0;
     }
 
-    @media (max-width: 768px) {
-      .container {
-        padding: 20px;
-      }
-      
-      h1 {
-        font-size: 1.8rem;
-      }
-      
-      .button-group {
-        flex-direction: column;
-      }
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid var(--primary-color);
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
     }
 
-    /* تأثيرات النيون */
-    .neon-text {
-      animation: neon-glow 1.5s ease-in-out infinite alternate;
-    }
-
-    @keyframes neon-glow {
-      from {
-        text-shadow: 0 0 5px var(--primary-color), 0 0 10px var(--primary-color);
-      }
-      to {
-        text-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color);
-      }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1 class="neon-text">DISCORD SENDER 24/7</h1>
-    <p class="subtitle">I'M READY TO SEND MESSAGES 24 HOURS!</p>
+    <h1>DISCORD SENDER 24/7</h1>
     
     <div class="warning">
-      <strong>WARNING:</strong> استخدام توكن الحساب الشخصي قد يؤدي إلى حظر حسابك من Discord. استخدم هذه الأداة بحذر ومسؤولية.
+      <strong>تحذير:</strong> استخدام التوكن الشخصي قد يؤدي إلى حظر حسابك. استخدم بحذر!
     </div>
     
     <div class="form-group">
       <label for="channelId">Channel ID:</label>
-      <input type="text" id="channelId" placeholder="123456789">
+      <input type="text" id="channelId" placeholder="أدخل Channel ID">
     </div>
     
     <div class="form-group">
       <label for="token">Discord Token:</label>
-      <input type="password" id="token" placeholder="أدخل توكن حسابك الشخصي">
+      <input type="password" id="token" placeholder="أدخل التوكن هنا">
     </div>
     
     <div class="form-group">
@@ -312,285 +187,177 @@
     
     <div class="form-group">
       <label for="delay">Delay Between Messages (seconds):</label>
-      <input type="number" id="delay" value="5" min="1" max="60">
+      <input type="number" id="delay" value="5" min="1">
     </div>
     
     <div class="button-group">
-      <button id="startBtn">START SENDING</button>
-      <button id="stopBtn" class="btn-stop" disabled>STOP SENDING</button>
+      <button id="startBtn">بدء الإرسال</button>
+      <button id="stopBtn" class="btn-stop" disabled>إيقاف</button>
+    </div>
+    
+    <div id="loader">
+      <div class="spinner"></div>
+      <p>جارٍ الإرسال...</p>
     </div>
     
     <div id="status">
-      Status: <span class="status-text inactive">INACTIVE</span>
+      الحالة: <span id="statusText">غير نشط</span>
     </div>
     
     <div id="logs"></div>
   </div>
 
   <script>
-    // إنشاء Web Worker
-    const workerCode = `
-      let isSending = false;
-      let abortController = null;
-      let delay = 5000;
-      
-      self.onmessage = async function(e) {
-        const { type, data } = e.data;
-        
-        if (type === 'START') {
-          isSending = true;
-          const { channelId, token, message, delay: newDelay } = data;
-          delay = newDelay * 1000;
-          
-          while (isSending) {
-            abortController = new AbortController();
-            
-            try {
-              const response = await fetch(\`https://discord.com/api/v9/channels/\${channelId}/messages\`, {
-                method: 'POST',
-                headers: {
-                  'Authorization': token,
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ content: message }),
-                signal: abortController.signal
-              });
-              
-              const result = await response.json();
-              self.postMessage({
-                type: 'LOG',
-                data: {
-                  status: 'success',
-                  message: 'Message sent successfully',
-                  response: result,
-                  timestamp: new Date().toLocaleTimeString()
-                }
-              });
-            } catch (error) {
-              self.postMessage({
-                type: 'LOG',
-                data: {
-                  status: 'error',
-                  message: 'Error sending message',
-                  error: error.message,
-                  timestamp: new Date().toLocaleTimeString()
-                }
-              });
-              
-              if (error.name === 'AbortError') {
-                self.postMessage({
-                  type: 'STOPPED'
-                });
-                break;
-              }
-            }
-            
-            if (isSending) {
-              await new Promise(resolve => setTimeout(resolve, delay));
-            }
-          }
-        }
-        
-        if (type === 'STOP') {
-          isSending = false;
-          if (abortController) {
-            abortController.abort();
-          }
-        }
-      };
-    `;
-
-    // إنشاء blob من كود الworker
-    const blob = new Blob([workerCode], { type: 'application/javascript' });
-    const workerUrl = URL.createObjectURL(blob);
-    const worker = new Worker(workerUrl);
-
+    // حالة التطبيق
+    let isSending = false;
+    let worker = null;
+    
     // عناصر DOM
     const startBtn = document.getElementById('startBtn');
     const stopBtn = document.getElementById('stopBtn');
-    const statusText = document.querySelector('#status .status-text');
+    const statusText = document.getElementById('statusText');
     const logsDiv = document.getElementById('logs');
-
-    // حالة التطبيق
-    let isSending = false;
-
-    // IndexedDB
-    let db;
-    const openDB = () => {
-      return new Promise((resolve, reject) => {
-        const request = indexedDB.open('DiscordSenderDB', 1);
-
-        request.onupgradeneeded = (event) => {
-          const db = event.target.result;
-          if (!db.objectStoreNames.contains('sessions')) {
-            db.createObjectStore('sessions', { keyPath: 'id' });
-          }
-        };
-
-        request.onsuccess = (event) => {
-          db = event.target.result;
-          resolve(db);
-        };
-
-        request.onerror = (event) => {
-          reject(event.target.error);
-        };
-      });
-    };
-
-    const saveSession = async (data) => {
-      if (!db) await openDB();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction('sessions', 'readwrite');
-        const store = tx.objectStore('sessions');
-        store.put({ id: 'current', ...data, lastUpdated: new Date() });
-        tx.oncomplete = resolve;
-        tx.onerror = (event) => reject(event.target.error);
-      });
-    };
-
-    const loadSession = async () => {
-      if (!db) await openDB();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction('sessions', 'readonly');
-        const store = tx.objectStore('sessions');
-        const request = store.get('current');
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = (event) => reject(event.target.error);
-      });
-    };
-
-    // تحميل الجلسة عند البدء
-    document.addEventListener('DOMContentLoaded', async () => {
+    const loader = document.getElementById('loader');
+    
+    // إضافة سجل
+    function addLog(message, type = 'info') {
+      const logEntry = document.createElement('div');
+      logEntry.className = `log-entry ${type}`;
+      logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logsDiv.prepend(logEntry);
+    }
+    
+    // التحقق من التوكن
+    async function validateToken(token) {
       try {
-        const session = await loadSession();
-        if (session) {
-          document.getElementById('channelId').value = session.channelId || '';
-          document.getElementById('token').value = session.token || '';
-          document.getElementById('message').value = session.message || '';
-          document.getElementById('delay').value = session.delay || 5;
-          
-          if (session.isActive) {
-            startSending();
-          }
-        }
+        const response = await fetch('https://discord.com/api/v9/users/@me', {
+          headers: { 'Authorization': token }
+        });
+        return response.ok;
       } catch (error) {
-        addLog('Error loading session: ' + error.message, 'error');
+        return false;
       }
-    });
-
+    }
+    
     // بدء الإرسال
     async function startSending() {
       const channelId = document.getElementById('channelId').value.trim();
       const token = document.getElementById('token').value.trim();
       const message = document.getElementById('message').value.trim();
       const delay = document.getElementById('delay').value;
-
+      
       if (!channelId || !token || !message) {
-        addLog('Please fill all fields', 'error');
+        addLog('الرجاء ملء جميع الحقول', 'error');
         return;
       }
-
+      
+      // التحقق من التوكن
+      loader.style.display = 'block';
+      const isValidToken = await validateToken(token);
+      loader.style.display = 'none';
+      
+      if (!isValidToken) {
+        addLog('التوكن غير صالح أو منتهي الصلاحية', 'error');
+        return;
+      }
+      
       isSending = true;
-      statusText.textContent = 'ACTIVE';
-      statusText.className = 'status-text active';
       startBtn.disabled = true;
       stopBtn.disabled = false;
-      document.getElementById('status').style.borderLeftColor = 'var(--success-color)';
-
-      // حفظ الجلسة
-      await saveSession({
-        channelId,
-        token,
-        message,
-        delay,
-        isActive: true
-      });
-
-      // بدء Worker
-      worker.postMessage({
-        type: 'START',
-        data: { channelId, token, message, delay }
-      });
-
-      addLog('Started sending messages', 'success');
+      statusText.textContent = 'نشط';
+      statusText.className = 'success';
+      
+      // إنشاء Web Worker
+      const workerCode = `
+        let isSending = true;
+        let delay = ${delay} * 1000;
+        
+        async function sendMessage() {
+          try {
+            const response = await fetch(\`https://discord.com/api/v9/channels/${channelId}/messages\`, {
+              method: 'POST',
+              headers: {
+                'Authorization': '${token}',
+                'Content-Type': 'application/json',
+                'User-Agent': 'Mozilla/5.0'
+              },
+              body: JSON.stringify({ content: \`${message}\` })
+            });
+            
+            const result = await response.json();
+            self.postMessage({
+              type: 'LOG',
+              data: {
+                status: response.ok ? 'success' : 'error',
+                message: response.ok ? 'تم الإرسال بنجاح' : \`خطأ: \${response.status}\`,
+                response: result
+              }
+            });
+            
+            if (!response.ok) throw new Error('فشل الإرسال');
+          } catch (error) {
+            self.postMessage({
+              type: 'LOG',
+              data: {
+                status: 'error',
+                message: \`فشل الإرسال: \${error.message}\`
+              }
+            });
+          }
+        }
+        
+        async function start() {
+          while (isSending) {
+            await sendMessage();
+            await new Promise(resolve => setTimeout(resolve, delay));
+          }
+        }
+        
+        self.onmessage = function(e) {
+          if (e.data.type === 'STOP') {
+            isSending = false;
+          }
+        };
+        
+        start();
+      `;
+      
+      const blob = new Blob([workerCode], { type: 'application/javascript' });
+      worker = new Worker(URL.createObjectURL(blob));
+      
+      worker.onmessage = function(e) {
+        const { type, data } = e.data;
+        if (type === 'LOG') {
+          addLog(data.message, data.status);
+        }
+      };
+      
+      addLog('بدأ الإرسال التلقائي', 'success');
     }
-
+    
     // إيقاف الإرسال
     function stopSending() {
+      if (worker) {
+        worker.postMessage({ type: 'STOP' });
+        worker.terminate();
+        worker = null;
+      }
+      
       isSending = false;
-      statusText.textContent = 'INACTIVE';
-      statusText.className = 'status-text inactive';
       startBtn.disabled = false;
       stopBtn.disabled = true;
-      document.getElementById('status').style.borderLeftColor = 'var(--danger-color)';
-
-      // إيقاف Worker
-      worker.postMessage({ type: 'STOP' });
-
-      // تحديث الجلسة
-      saveSession({
-        isActive: false
-      });
-
-      addLog('Stopped sending messages', 'warning');
+      statusText.textContent = 'متوقف';
+      statusText.className = 'error';
+      addLog('تم إيقاف الإرسال', 'warning');
     }
-
-    // إضافة سجل
-    function addLog(message, type = 'info', data = null) {
-      const logEntry = document.createElement('div');
-      logEntry.className = 'log-entry';
-      
-      const time = new Date().toLocaleTimeString();
-      logEntry.innerHTML = \`
-        <div class="log-time">[\${time}]</div>
-        <div class="log-message \${type}-log">\${message}</div>
-      \`;
-      
-      if (data) {
-        const details = document.createElement('div');
-        details.className = 'log-details';
-        details.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
-        logEntry.appendChild(details);
-      }
-      
-      logsDiv.prepend(logEntry);
-      
-      // الحفاظ على عدد معقول من السجلات
-      if (logsDiv.children.length > 50) {
-        logsDiv.removeChild(logsDiv.lastChild);
-      }
-    }
-
-    // استقبال رسائل من Worker
-    worker.onmessage = function(e) {
-      const { type, data } = e.data;
-      
-      if (type === 'LOG') {
-        addLog(data.message, data.status, data.error || data.response);
-      }
-      
-      if (type === 'STOPPED') {
-        stopSending();
-      }
-    };
-
+    
     // أحداث الأزرار
     startBtn.addEventListener('click', startSending);
     stopBtn.addEventListener('click', stopSending);
-
-    // Service Worker التسجيل
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(registration => {
-            console.log('ServiceWorker registration successful');
-          })
-          .catch(err => {
-            console.log('ServiceWorker registration failed: ', err);
-          });
-      });
-    }
+    
+    // حماية من النسخ/اللصق
+    document.addEventListener('copy', (e) => e.preventDefault());
+    document.addEventListener('paste', (e) => e.preventDefault());
   </script>
 </body>
 </html>
