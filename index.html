@@ -169,21 +169,23 @@
 
   <script>
     // ==========================================
-    // نظام التطبيق التلقائي 24/7
+    // نظام التطبيق التلقائي 24/7 المحسن
     // ==========================================
     
-    class DiscordSender24_7 {
+    class EnhancedDiscordSender {
       constructor() {
-        this.STATE_KEY = 'discordSender24_7State';
-        this.CONFIG_KEY = 'discordSender24_7Config';
-        this.SESSION_ID = this.generateSessionId();
+        this.STATE_KEY = 'enhancedDiscordSenderState';
+        this.CONFIG_KEY = 'enhancedDiscordSenderConfig';
+        this.SESSION_ID = this.generateRandomSessionId();
         this.worker = null;
         this.isSending = false;
         this.is24_7Mode = false;
-        this.appVersion = '3.0.0-24-7';
+        this.appVersion = '4.0.0-enhanced';
         this.monitorUrl = '';
         this.elements = {};
         this.keepAliveInterval = null;
+        this.inactivityTimer = null;
+        this.MAX_INACTIVITY = 10 * 60 * 1000; // 10 دقائق
         
         this.initApp();
       }
@@ -197,8 +199,15 @@
         this.addLog(`تم تحميل DISCORD SENDER PRO 24/7 الإصدار ${this.appVersion}`, 'info');
         this.addLog(`معرف الجلسة: ${this.SESSION_ID}`, 'info');
         
-        // محاولة استئناف الجلسة التلقائي
-        this.attemptAutoResume();
+        // التحقق من وضع المراقبة في URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const monitorSession = urlParams.get('monitor');
+        
+        if (monitorSession) {
+          this.activateMonitorMode(monitorSession);
+        } else {
+          this.attemptAutoResume();
+        }
       }
       
       // إنشاء واجهة المستخدم ديناميكياً
@@ -294,9 +303,11 @@
         };
       }
       
-      // توليد معرف جلسة فريد
-      generateSessionId() {
-        return 'session-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      // توليد معرف جلسة عشوائي أكثر أماناً
+      generateRandomSessionId() {
+        const timestamp = Date.now().toString(36);
+        const randomPart = window.crypto.getRandomValues(new Uint32Array(1))[0].toString(36);
+        return `session-${timestamp}-${randomPart}`;
       }
       
       // إنشاء رابط مراقبة فريد
@@ -358,19 +369,11 @@
             }, 1500);
           }
         }
-        
-        // التحقق من وضع المراقبة في URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const monitorSession = urlParams.get('monitor');
-        if (monitorSession) {
-          this.addLog(`وضع المراقبة للجلسة: ${monitorSession}`, 'info');
-          this.activateMonitorMode(monitorSession);
-        }
       }
       
       // تفعيل وضع المراقبة
       activateMonitorMode(sessionId) {
-        this.addLog('جارٍ تفعيل وضع المراقبة 24/7...', 'info');
+        this.addLog(`تم تفعيل وضع المراقبة للجلسة: ${sessionId}`, 'info');
         
         // إخفاء عناصر التحكم
         document.querySelector('.settings-section').style.display = 'none';
@@ -382,28 +385,48 @@
         this.elements.status.className = 'status-24-7';
         
         // نظام إبقاء الجلسة نشطة
-        this.keepSessionAlive(sessionId);
+        this.startKeepAliveSystem(sessionId);
       }
       
-      // نظام إبقاء الجلسة نشطة
-      keepSessionAlive(sessionId) {
-        // إرسال نبضات حياة كل 30 ثانية
+      // نظام إبقاء الجلسة نشطة مع تحسينات
+      startKeepAliveSystem(sessionId) {
+        // إلغاء أي مؤقتات سابقة
+        if (this.keepAliveInterval) clearInterval(this.keepAliveInterval);
+        if (this.inactivityTimer) clearTimeout(this.inactivityTimer);
+        
+        // تحديث آخر نشاط
+        this.lastActivity = Date.now();
+        
+        // إرسال نبضات حياة كل دقيقة
         this.keepAliveInterval = setInterval(() => {
           fetch(window.location.href, {
             method: 'HEAD',
             cache: 'no-cache'
           }).then(() => {
-            console.log(`نبضة حياة للجلسة ${sessionId} - ${new Date().toLocaleTimeString()}`);
+            this.lastActivity = Date.now();
+            console.log(`[${new Date().toLocaleTimeString()}] نبضة حياة للجلسة ${sessionId}`);
           }).catch(err => {
             console.error('فشل في إرسال نبضة الحياة:', err);
           });
-        }, 30000);
+        }, 60 * 1000); // كل دقيقة
+        
+        // مراقبة عدم النشاط
+        this.inactivityTimer = setInterval(() => {
+          const inactiveTime = Date.now() - this.lastActivity;
+          if (inactiveTime > this.MAX_INACTIVITY) {
+            this.addLog('تم إيقاف الجلسة بسبب عدم النشاط', 'warning');
+            this.stopSending();
+            clearInterval(this.inactivityTimer);
+          }
+        }, 30 * 1000); // التحقق كل 30 ثانية
         
         // إرسال أول نبضة فوراً
         setTimeout(() => {
           fetch(window.location.href, {
             method: 'HEAD',
             cache: 'no-cache'
+          }).then(() => {
+            this.lastActivity = Date.now();
           });
         }, 1000);
       }
@@ -618,6 +641,11 @@
           this.keepAliveInterval = null;
         }
         
+        if (this.inactivityTimer) {
+          clearTimeout(this.inactivityTimer);
+          this.inactivityTimer = null;
+        }
+        
         this.saveState({ isActive: false });
         this.updateUI(false);
         this.elements.monitorLinkContainer.style.display = 'none';
@@ -683,7 +711,7 @@
     
     // بدء التطبيق عند تحميل الصفحة
     document.addEventListener('DOMContentLoaded', () => {
-      new DiscordSender24_7();
+      new EnhancedDiscordSender();
     });
   </script>
 </body>
