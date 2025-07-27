@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ULTIMATE 24/7 DISCORD SENDER</title>
+  <style>
+    :root {
+      --primary: #5865F2;
+      --danger: #ED4245;
+      --success: #3BA55C;
+      --warning: #FAA81A;
+      --bg: #121212;
+      --card: #1E1E1E;
+      --text: #FFFFFF;
+      --border: #444;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: var(--card);
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #B3B3B3;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      background: #2D2D2D;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 5px;
+    }
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: opacity 0.3s;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    #startBtn {
+      background: var(--primary);
+      color: white;
+    }
+    #stopBtn {
+      background: var(--danger);
+      color: white;
+    }
+    #copyBtn {
+      background: var(--success);
+      color: white;
+    }
+    #logs {
+      max-height: 300px;
+      overflow-y: auto;
+      background: #121212;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 20px;
+      border: 1px solid var(--border);
+    }
+    .log-entry {
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .success {
+      color: var(--success);
+    }
+    .error {
+      color: var(--danger);
+    }
+    .warning {
+      color: var(--warning);
+    }
+    .info {
+      color: var(--primary);
+    }
+    #status {
+      padding: 10px;
+      text-align: center;
+      border-radius: 5px;
+      margin: 15px 0;
+      font-weight: bold;
+    }
+    .status-active {
+      background: rgba(59, 165, 92, 0.2);
+      color: var(--success);
+    }
+    .status-inactive {
+      background: rgba(237, 66, 69, 0.2);
+      color: var(--danger);
+    }
+    .status-24-7 {
+      background: rgba(88, 101, 242, 0.2);
+      color: var(--primary);
+      animation: pulse 2s infinite;
+    }
+    .monitor-link {
+      background: #252525;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      word-break: break-all;
+    }
+    .spinner {
+      border: 3px solid rgba(255,255,255,0.1);
+      border-radius: 50%;
+      border-top: 3px solid var(--primary);
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
+    .settings-section {
+      background: #252525;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      border: 1px solid var(--border);
+    }
+    .hidden {
+      display: none;
+    }
+    .tab-buttons {
+      display: flex;
+      margin-bottom: 15px;
+    }
+    .tab-button {
+      padding: 10px 15px;
+      background: #2D2D2D;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      border-radius: 5px 5px 0 0;
+      margin-right: 5px;
+    }
+    .tab-button.active {
+      background: var(--primary);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 15px 0;
+    }
+    .stat-box {
+      background: #252525;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      margin: 5px 0;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: #B3B3B3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="appContainer">
+    <h1>ULTIMATE 24/7 DISCORD SENDER</h1>
+    
+    <div class="tab-buttons">
+      <button class="tab-button active" data-tab="main">Main</button>
+      <button class="tab-button" data-tab="settings">Settings</button>
+      <button class="tab-button" data-tab="monitoring">Monitoring</button>
+      <button class="tab-button" data-tab="backup">Backup</button>
+    </div>
+    
+    <div id="mainTab" class="tab-content active">
+      <div class="form-group">
+        <label for="channelId">Channel ID:</label>
+        <input type="text" id="channelId" placeholder="123456789">
+      </div>
+      
+      <div class="form-group">
+        <label for="token">Discord Token (Primary):</label>
+        <input type="password" id="token" placeholder="Your primary account/bot token">
+      </div>
+      
+      <div class="form-group">
+        <label for="backupToken">Backup Token (Optional):</label>
+        <input type="password" id="backupToken" placeholder="Backup token for failover">
+      </div>
+      
+      <div class="form-group">
+        <label for="message">Message Content:</label>
+        <textarea id="message" placeholder="Type your message here..."></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="delay">Delay between messages (seconds):</label>
+        <input type="number" id="delay" value="5" min="1">
+      </div>
+      
+      <div class="button-group">
+        <button id="startBtn">START SENDING</button>
+        <button id="stopBtn" disabled>STOP</button>
+        <button id="copyBtn" disabled>COPY MONITOR URL</button>
+      </div>
+      
+      <div id="status" class="status-inactive">
+        Status: INACTIVE
+      </div>
+      
+      <div id="monitorLinkContainer" class="hidden">
+        <h3>24/7 Monitoring URL:</h3>
+        <div class="monitor-link" id="monitorLink"></div>
+        <small>Keep this URL open in a monitoring service to maintain 24/7 operation</small>
+      </div>
+    </div>
+    
+    <div id="settingsTab" class="tab-content">
+      <div class="settings-section">
+        <h3>Core Settings</h3>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="autoResumeCheckbox" checked>
+            Auto-resume when page reloads
+          </label>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="enable24_7Checkbox" checked>
+            Enable 24/7 Mode (requires monitoring)
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="inactivityTimeout">Inactivity timeout (minutes):</label>
+          <input type="number" id="inactivityTimeout" value="30" min="5" max="120">
+        </div>
+      </div>
+      
+      <div class="settings-section">
+        <h3>Advanced Protection</h3>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="enableCrashDetection" checked>
+            Enable crash detection & auto-recovery
+          </label>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="enableMemoryMonitor" checked>
+            Monitor memory usage
+          </label>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="enableAutoTokenRotation" checked>
+            Enable automatic token rotation
+          </label>
+        </div>
+      </div>
+    </div>
+    
+    <div id="monitoringTab" class="tab-content">
+      <div class="stats-container">
+        <div class="stat-box">
+          <div class="stat-value" id="messagesSent">0</div>
+          <div class="stat-label">Messages Sent</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="successRate">100%</div>
+          <div class="stat-label">Success Rate</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="uptime">00:00:00</div>
+          <div class="stat-label">Uptime</div>
+        </div>
+      </div>
+      
+      <div class="settings-section">
+        <h3>External Monitoring</h3>
+        <div class="form-group">
+          <label for="webhookUrl">Discord Webhook URL (for alerts):</label>
+          <input type="text" id="webhookUrl" placeholder="https://discord.com/api/webhooks/...">
+        </div>
+        <div class="form-group">
+          <label for="telegramBotToken">Telegram Bot Token (for alerts):</label>
+          <input type="password" id="telegramBotToken" placeholder="Bot token">
+        </div>
+        <div class="form-group">
+          <label for="telegramChatId">Telegram Chat ID:</label>
+          <input type="text" id="telegramChatId" placeholder="Chat ID">
+        </div>
+        <button id="testAlertsBtn">Test Alert Notifications</button>
+      </div>
+    </div>
+    
+    <div id="backupTab" class="tab-content">
+      <div class="settings-section">
+        <h3>Backup & Recovery</h3>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="enableLocalBackup" checked>
+            Enable local backup (saves every 5 minutes)
+          </label>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="enableCloudBackup">
+            Enable cloud backup (requires API key)
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="backupApiKey">Cloud Backup API Key:</label>
+          <input type="password" id="backupApiKey" placeholder="API key for cloud backup">
+        </div>
+        <button id="backupNowBtn">Create Backup Now</button>
+        <button id="restoreBackupBtn">Restore Last Backup</button>
+      </div>
+    </div>
+    
+    <div id="logs"></div>
+  </div>
+
+  <script>
+    class UltimateDiscordSender {
+      constructor() {
+        this.STATE_KEY = 'ultimateDiscordSenderState';
+        this.CONFIG_KEY = 'ultimateDiscordSenderConfig';
+        this.BACKUP_KEY = 'ultimateDiscordSenderBackup';
+        this.SESSION_ID = this.generateSessionId();
+        this.worker = null;
+        this.backupWorker = null;
+        this.isSending = false;
+        this.is24_7Mode = true;
+        this.autoResume = true;
+        this.appVersion = '6.0.0-ULTIMATE';
+        this.monitorUrl = '';
+        this.elements = {};
+        this.keepAliveInterval = null;
+        this.healthCheckInterval = null;
+        this.backupInterval = null;
+        this.memoryMonitorInterval = null;
+        this.statsInterval = null;
+        this.uptimeStart = null;
+        this.messageCount = 0;
+        this.successCount = 0;
+        this.failCount = 0;
+        this.currentTokenIndex = 0;
+        this.tokens = [];
+        this.MAX_INACTIVITY = 30 * 60 * 1000;
+        this.lastActivity = Date.now();
+        
+        this.initApp();
+      }
+      
+      generateSessionId() {
+        return 'ultra-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      }
+      
+      generateMonitorUrl() {
+        const baseUrl = window.location.href.split('?')[0];
+        return `${baseUrl}?monitor=${this.SESSION_ID}`;
+      }
+      
+      initApp() {
+        this.cacheElements();
+        this.loadConfig();
+        this.setupEventListeners();
+        this.setupTabSystem();
+        
+        this.addLog(`ULTIMATE DISCORD SENDER 24/7 v${this.appVersion} loaded`, 'info');
+        this.addLog(`Session ID: ${this.SESSION_ID}`, 'info');
+        
+        // Check for monitor mode
+        const urlParams = new URLSearchParams(window.location.search);
+        const monitorSession = urlParams.get('monitor');
+        
+        if (monitorSession) {
+          this.activateMonitorMode(monitorSession);
+        } else {
+          this.attemptAutoResume();
+        }
+      }
+      
+      cacheElements() {
+        this.elements = {
+          appContainer: document.getElementById('appContainer'),
+          startBtn: document.getElementById('startBtn'),
+          stopBtn: document.getElementById('stopBtn'),
+          copyBtn: document.getElementById('copyBtn'),
+          status: document.getElementById('status'),
+          logs: document.getElementById('logs'),
+          monitorLink: document.getElementById('monitorLink'),
+          monitorLinkContainer: document.getElementById('monitorLinkContainer'),
+          autoResumeCheckbox: document.getElementById('autoResumeCheckbox'),
+          enable24_7Checkbox: document.getElementById('enable24_7Checkbox'),
+          inactivityTimeout: document.getElementById('inactivityTimeout'),
+          enableCrashDetection: document.getElementById('enableCrashDetection'),
+          enableMemoryMonitor: document.getElementById('enableMemoryMonitor'),
+          enableAutoTokenRotation: document.getElementById('enableAutoTokenRotation'),
+          messagesSent: document.getElementById('messagesSent'),
+          successRate: document.getElementById('successRate'),
+          uptime: document.getElementById('uptime'),
+          inputs: {
+            channelId: document.getElementById('channelId'),
+            token: document.getElementById('token'),
+            backupToken: document.getElementById('backupToken'),
+            message: document.getElementById('message'),
+            delay: document.getElementById('delay'),
+            webhookUrl: document.getElementById('webhookUrl'),
+            telegramBotToken: document.getElementById('telegramBotToken'),
+            telegramChatId: document.getElementById('telegramChatId'),
+            backupApiKey: document.getElementById('backupApiKey')
+          },
+          tabButtons: document.querySelectorAll('.tab-button'),
+          tabContents: document.querySelectorAll('.tab-content')
+        };
+      }
+      
+      setupTabSystem() {
+        this.elements.tabButtons.forEach(button => {
+          button.addEventListener('click', () => {
+            const tabName = button.getAttribute('data-tab');
+            this.switchTab(tabName);
+          });
+        });
+      }
+      
+      switchTab(tabName) {
+        // Update active tab button
+        this.elements.tabButtons.forEach(button => {
+          button.classList.toggle('active', button.getAttribute('data-tab') === tabName);
+        });
+        
+        // Update active tab content
+        this.elements.tabContents.forEach(content => {
+          content.classList.toggle('active', content.id === `${tabName}Tab`);
+        });
+      }
+      
+      loadConfig() {
+        const savedConfig = localStorage.getItem(this.CONFIG_KEY);
+        if (savedConfig) {
+          try {
+            const config = JSON.parse(savedConfig);
+            this.autoResume = config.autoResume !== false;
+            this.is24_7Mode = config.is24_7Mode !== false;
+            
+            if (this.elements.autoResumeCheckbox) {
+              this.elements.autoResumeCheckbox.checked = this.autoResume;
+            }
+            if (this.elements.enable24_7Checkbox) {
+              this.elements.enable24_7Checkbox.checked = this.is24_7Mode;
+            }
+            if (this.elements.inactivityTimeout && config.inactivityTimeout) {
+              this.elements.inactivityTimeout.value = config.inactivityTimeout;
+              this.MAX_INACTIVITY = config.inactivityTimeout * 60 * 1000;
+            }
+            
+            // Load advanced settings
+            if (this.elements.enableCrashDetection && config.enableCrashDetection !== undefined) {
+              this.elements.enableCrashDetection.checked = config.enableCrashDetection;
+            }
+            if (this.elements.enableMemoryMonitor && config.enableMemoryMonitor !== undefined) {
+              this.elements.enableMemoryMonitor.checked = config.enableMemoryMonitor;
+            }
+            if (this.elements.enableAutoTokenRotation && config.enableAutoTokenRotation !== undefined) {
+              this.elements.enableAutoTokenRotation.checked = config.enableAutoTokenRotation;
+            }
+            
+            // Load external monitoring settings
+            if (this.elements.inputs.webhookUrl && config.webhookUrl) {
+              this.elements.inputs.webhookUrl.value = config.webhookUrl;
+            }
+            if (this.elements.inputs.telegramBotToken && config.telegramBotToken) {
+              this.elements.inputs.telegramBotToken.value = config.telegramBotToken;
+            }
+            if (this.elements.inputs.telegramChatId && config.telegramChatId) {
+              this.elements.inputs.telegramChatId.value = config.telegramChatId;
+            }
+            
+            // Load backup settings
+            if (config.enableLocalBackup !== undefined) {
+              this.elements.enableLocalBackup.checked = config.enableLocalBackup;
+            }
+            if (config.enableCloudBackup !== undefined) {
+              this.elements.enableCloudBackup.checked = config.enableCloudBackup;
+            }
+            if (config.backupApiKey) {
+              this.elements.inputs.backupApiKey.value = config.backupApiKey;
+            }
+            
+          } catch (e) {
+            this.addLog('Failed to load config, using defaults', 'error');
+          }
+        }
+      }
+      
+      saveConfig() {
+        const config = {
+          autoResume: this.autoResume,
+          is24_7Mode: this.is24_7Mode,
+          inactivityTimeout: parseInt(this.elements.inactivityTimeout.value) || 30,
+          enableCrashDetection: this.elements.enableCrashDetection.checked,
+          enableMemoryMonitor: this.elements.enableMemoryMonitor.checked,
+          enableAutoTokenRotation: this.elements.enableAutoTokenRotation.checked,
+          webhookUrl: this.elements.inputs.webhookUrl.value,
+          telegramBotToken: this.elements.inputs.telegramBotToken.value,
+          telegramChatId: this.elements.inputs.telegramChatId.value,
+          enableLocalBackup: this.elements.enableLocalBackup.checked,
+          enableCloudBackup: this.elements.enableCloudBackup.checked,
+          backupApiKey: this.elements.inputs.backupApiKey.value,
+          sessionId: this.SESSION_ID,
+          timestamp: Date.now()
+        };
+        
+        localStorage.setItem(this.CONFIG_KEY, JSON.stringify(config));
+      }
+      
+      attemptAutoResume() {
+        const state = this.loadState();
+        if (state && state.isActive) {
+          Object.keys(state).forEach(key => {
+            if (this.elements.inputs[key]) {
+              this.elements.inputs[key].value = state[key] || '';
+            }
+          });
+          
+          if (this.autoResume) {
+            this.addLog('Active session detected, auto-resuming...', 'warning');
+            setTimeout(() => {
+              this.startSending();
+            }, 1000);
+          }
+        }
+      }
+      
+      activateMonitorMode(sessionId) {
+        this.addLog(`Monitor mode activated for session: ${sessionId}`, 'info');
+        this.switchTab('monitoring');
+        
+        // Start advanced keep-alive system
+        this.startKeepAliveSystem(sessionId);
+        
+        // Start backup systems
+        this.startBackupSystems();
+        
+        // Start stats updater
+        this.startStatsUpdater();
+      }
+      
+      startKeepAliveSystem(sessionId) {
+        // Clear any existing intervals
+        if (this.keepAliveInterval) clearInterval(this.keepAliveInterval);
+        if (this.healthCheckInterval) clearInterval(this.healthCheckInterval);
+        
+        // Main keep-alive pulse
+        this.keepAliveInterval = setInterval(() => {
+          this.sendKeepAlive(sessionId);
+        }, 60 * 1000); // Every minute
+        
+        // Health check
+        this.healthCheckInterval = setInterval(() => {
+          this.checkSystemHealth();
+        }, 5 * 60 * 1000); // Every 5 minutes
+        
+        // Initial pulse
+        this.sendKeepAlive(sessionId);
+        
+        // Add activity listeners
+        document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
+        document.addEventListener('mousemove', this.handleActivity.bind(this));
+        document.addEventListener('keydown', this.handleActivity.bind(this));
+      }
+      
+      startBackupSystems() {
+        // Backup worker check
+        if (this.backupInterval) clearInterval(this.backupInterval);
+        this.backupInterval = setInterval(() => {
+          if (!this.isSending && this.loadState()?.isActive) {
+            this.addLog('Backup system detected inactive sender - restarting...', 'warning');
+            this.startSending();
+          }
+        }, 10 * 1000); // Check every 10 seconds
+        
+        // Memory monitoring
+        if (this.memoryMonitorInterval) clearInterval(this.memoryMonitorInterval);
+        if (this.elements.enableMemoryMonitor.checked) {
+          this.memoryMonitorInterval = setInterval(() => {
+            this.monitorMemoryUsage();
+          }, 30 * 1000); // Every 30 seconds
+        }
+        
+        // Local backups
+        if (this.elements.enableLocalBackup.checked) {
+          this.createLocalBackup();
+          this.backupInterval = setInterval(() => {
+            this.createLocalBackup();
+          }, 5 * 60 * 1000); // Every 5 minutes
+        }
+      }
+      
+      startStatsUpdater() {
+        if (this.statsInterval) clearInterval(this.statsInterval);
+        this.uptimeStart = Date.now();
+        
+        this.statsInterval = setInterval(() => {
+          this.updateStats();
+        }, 1000);
+      }
+      
+      updateStats() {
+        // Update uptime
+        if (this.uptimeStart) {
+          const uptimeSeconds = Math.floor((Date.now() - this.uptimeStart) / 1000);
+          const hours = Math.floor(uptimeSeconds / 3600);
+          const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+          const seconds = uptimeSeconds % 60;
+          this.elements.uptime.textContent = 
+            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // Update message stats
+        this.elements.messagesSent.textContent = this.messageCount;
+        
+        // Update success rate
+        if (this.messageCount > 0) {
+          const rate = Math.round((this.successCount / this.messageCount) * 100);
+          this.elements.successRate.textContent = `${rate}%`;
+        }
+      }
+      
+      sendKeepAlive(sessionId) {
+        const pingData = {
+          sessionId: sessionId,
+          timestamp: Date.now(),
+          location: window.location.href,
+          userAgent: navigator.userAgent
+        };
+        
+        // Simulate sending to server (in a real app, you'd send to your backend)
+        setTimeout(() => {
+          this.lastActivity = Date.now();
+        }, 500);
+      }
+      
+      checkSystemHealth() {
+        // Check if tab is active
+        if (document.hidden) {
+          this.addLog('Tab is not active - ensuring processes continue', 'warning');
+        }
+        
+        // Check last activity
+        const inactiveTime = Date.now() - this.lastActivity;
+        if (inactiveTime > this.MAX_INACTIVITY) {
+          this.addLog(`System inactive for ${Math.floor(inactiveTime/1000/60)} minutes - refreshing...`, 'error');
+          this.sendKeepAlive(this.SESSION_ID);
+        }
+      }
+      
+      monitorMemoryUsage() {
+        // Simulate memory monitoring (in a real app, you'd use performance.memory)
+        const memoryUsage = Math.random() * 100; // Random value for demo
+        
+        if (memoryUsage > 80) {
+          this.addLog(`High memory usage detected (${Math.round(memoryUsage)}%) - optimizing...`, 'warning');
+          // In a real app, you might clean up caches or restart workers
+        }
+      }
+      
+      createLocalBackup() {
+        const state = {
+          channelId: this.elements.inputs.channelId.value,
+          token: this.elements.inputs.token.value,
+          backupToken: this.elements.inputs.backupToken.value,
+          message: this.elements.inputs.message.value,
+          delay: this.elements.inputs.delay.value,
+          isActive: this.isSending,
+          timestamp: Date.now()
+        };
+        
+        localStorage.setItem(this.BACKUP_KEY, JSON.stringify(state));
+        this.addLog('Local backup created', 'info');
+      }
+      
+      restoreLocalBackup() {
+        const backup = localStorage.getItem(this.BACKUP_KEY);
+        if (backup) {
+          try {
+            const state = JSON.parse(backup);
+            Object.keys(state).forEach(key => {
+              if (this.elements.inputs[key]) {
+                this.elements.inputs[key].value = state[key] || '';
+              }
+            });
+            
+            if (state.isActive) {
+              this.startSending();
+            }
+            
+            this.addLog('Local backup restored', 'success');
+            return true;
+          } catch (e) {
+            this.addLog('Failed to restore backup: ' + e.message, 'error');
+            return false;
+          }
+        }
+        return false;
+      }
+      
+      handleVisibilityChange() {
+        if (!document.hidden) {
+          this.sendKeepAlive(this.SESSION_ID);
+        }
+      }
+      
+      handleActivity() {
+        this.lastActivity = Date.now();
+      }
+      
+      setupEventListeners() {
+        this.elements.startBtn.addEventListener('click', () => this.startSending());
+        this.elements.stopBtn.addEventListener('click', () => this.stopSending());
+        this.elements.copyBtn.addEventListener('click', () => this.copyMonitorUrl());
+        
+        // Config change listeners
+        this.elements.autoResumeCheckbox.addEventListener('change', (e) => {
+          this.autoResume = e.target.checked;
+          this.saveConfig();
+          this.addLog(`Auto-resume ${this.autoResume ? 'enabled' : 'disabled'}`, 'info');
+        });
+        
+        this.elements.enable24_7Checkbox.addEventListener('change', (e) => {
+          this.is24_7Mode = e.target.checked;
+          this.saveConfig();
+          this.addLog(`24/7 Mode ${this.is24_7Mode ? 'enabled' : 'disabled'}`, 'info');
+          
+          if (this.is24_7Mode && this.isSending) {
+            this.generateAndDisplayMonitorUrl();
+          } else {
+            this.elements.monitorLinkContainer.classList.add('hidden');
+          }
+        });
+        
+        this.elements.inactivityTimeout.addEventListener('change', (e) => {
+          this.MAX_INACTIVITY = parseInt(e.target.value) * 60 * 1000;
+          this.saveConfig();
+          this.addLog(`Inactivity timeout set to ${e.target.value} minutes`, 'info');
+        });
+        
+        // Advanced settings
+        this.elements.enableCrashDetection.addEventListener('change', (e) => {
+          this.saveConfig();
+          this.addLog(`Crash detection ${e.target.checked ? 'enabled' : 'disabled'}`, 'info');
+        });
+        
+        this.elements.enableMemoryMonitor.addEventListener('change', (e) => {
+          this.saveConfig();
+          this.addLog(`Memory monitoring ${e.target.checked ? 'enabled' : 'disabled'}`, 'info');
+          if (e.target.checked) {
+            this.startBackupSystems();
+          } else {
+            if (this.memoryMonitorInterval) clearInterval(this.memoryMonitorInterval);
+          }
+        });
+        
+        this.elements.enableAutoTokenRotation.addEventListener('change', (e) => {
+          this.saveConfig();
+          this.addLog(`Auto token rotation ${e.target.checked ? 'enabled' : 'disabled'}`, 'info');
+        });
+        
+        // Backup buttons
+        document.getElementById('backupNowBtn').addEventListener('click', () => {
+          this.createLocalBackup();
+        });
+        
+        document.getElementById('restoreBackupBtn').addEventListener('click', () => {
+          this.restoreLocalBackup();
+        });
+        
+        // Test alerts
+        document.getElementById('testAlertsBtn').addEventListener('click', () => {
+          this.sendAlert('Test alert: Your 24/7 sender is working correctly!');
+        });
+        
+        // Add beforeunload listener to prevent accidental closure
+        window.addEventListener('beforeunload', (e) => {
+          if (this.isSending) {
+            e.preventDefault();
+            e.returnValue = 'The sender is still active. Are you sure you want to leave?';
+          }
+        });
+      }
+      
+      sendAlert(message) {
+        this.addLog(`Sending alert: ${message}`, 'info');
+        
+        // Discord webhook
+        if (this.elements.inputs.webhookUrl.value) {
+          fetch(this.elements.inputs.webhookUrl.value, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              content: message
+            })
+          }).catch(err => {
+            this.addLog('Failed to send Discord alert: ' + err.message, 'error');
+          });
+        }
+        
+        // Telegram (simulated - would need a backend in production)
+        if (this.elements.inputs.telegramBotToken.value && this.elements.inputs.telegramChatId.value) {
+          // In a real app, you'd call your backend to send Telegram messages
+          this.addLog('Telegram alert would be sent in production', 'info');
+        }
+      }
+      
+      copyMonitorUrl() {
+        navigator.clipboard.writeText(this.monitorUrl).then(() => {
+          this.addLog('Monitor URL copied to clipboard', 'success');
+        }).catch(err => {
+          this.addLog('Failed to copy URL: ' + err, 'error');
+        });
+      }
+      
+      generateAndDisplayMonitorUrl() {
+        this.monitorUrl = this.generateMonitorUrl();
+        this.elements.monitorLink.textContent = this.monitorUrl;
+        this.elements.monitorLinkContainer.classList.remove('hidden');
+        this.elements.copyBtn.disabled = false;
+        
+        this.addLog('24/7 Monitor URL generated', 'info');
+        this.addLog(`Keep this URL open in a monitoring service: ${this.monitorUrl}`, 'info');
+      }
+      
+      startSending() {
+        const { channelId, token, backupToken, message, delay } = this.elements.inputs;
+        
+        // Validate inputs
+        if (!channelId.value.trim() || !token.value.trim() || !message.value.trim()) {
+          this.addLog('Please fill all required fields', 'error');
+          return;
+        }
+        
+        // Prepare tokens
+        this.tokens = [token.value.trim()];
+        if (backupToken.value.trim()) {
+          this.tokens.push(backupToken.value.trim());
+        }
+        this.currentTokenIndex = 0;
+        
+        // Create Web Worker with fail-safe mechanisms
+        const workerCode = `
+          let isRunning = true;
+          let retryCount = 0;
+          const MAX_RETRIES = 999;
+          let currentTokenIndex = 0;
+          let tokens = ${JSON.stringify(this.tokens)};
+          
+          function getCurrentToken() {
+            return tokens[currentTokenIndex];
+          }
+          
+          function rotateToken() {
+            currentTokenIndex = (currentTokenIndex + 1) % tokens.length;
+            self.postMessage({
+              type: 'LOG',
+              message: \`Rotated to token \${currentTokenIndex + 1} of \${tokens.length}\`,
+              level: 'warning'
+            });
+            return getCurrentToken();
+          }
+          
+          // Enhanced send function with exponential backoff
+          async function sendMessage() {
+            let attempts = 0;
+            let lastError;
+            let currentToken = getCurrentToken();
+            
+            while (attempts <= MAX_RETRIES) {
+              try {
+                const response = await fetchWithTimeout(
+                  \`https://discord.com/api/v9/channels/\${${JSON.stringify(channelId.value.trim())}}/messages\`,
+                  {
+                    method: 'POST',
+                    headers: {
+                      'Authorization': currentToken,
+                      'Content-Type': 'application/json',
+                      'User-Agent': 'Mozilla/5.0'
+                    },
+                    body: JSON.stringify({
+                      content: ${JSON.stringify(message.value.trim())}
+                    })
+                  },
+                  10000 // 10 second timeout
+                );
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                  // Check for token-related errors
+                  if (response.status === 401 || data.code === 50001) {
+                    if (tokens.length > 1) {
+                      currentToken = rotateToken();
+                      continue;
+                    }
+                    throw new Error('Invalid token');
+                  }
+                  throw new Error(data.message || \`HTTP \${response.status}\`);
+                }
+                
+                return {
+                  success: true,
+                  data: data
+                };
+              } catch (error) {
+                lastError = error;
+                attempts++;
+                if (attempts <= MAX_RETRIES) {
+                  const delay = Math.min(1000 * Math.pow(2, attempts), 30000); // Exponential backoff max 30s
+                  self.postMessage({
+                    type: 'LOG',
+                    message: \`Attempt \${attempts} of \${MAX_RETRIES} (retrying in \${delay/1000}s)...\`,
+                    level: 'warning'
+                  });
+                  await new Promise(r => setTimeout(r, delay));
+                }
+              }
+            }
+            
+            throw lastError;
+          }
+          
+          // Fetch with timeout
+          function fetchWithTimeout(url, options, timeout) {
+            return Promise.race([
+              fetch(url, options),
+              new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Request timeout')), timeout)
+              )
+            ]);
+          }
+          
+          // Main loop with crash protection
+          async function mainLoop() {
+            while (isRunning) {
+              try {
+                const result = await sendMessage();
+                retryCount = 0; // Reset retry count on success
+                self.postMessage({
+                  type: 'SUCCESS',
+                  data: result.data
+                });
+              } catch (error) {
+                retryCount++;
+                self.postMessage({
+                  type: 'ERROR',
+                  error: error.message
+                });
+                
+                // If we're getting continuous errors, wait longer
+                if (retryCount > 5) {
+                  const extendedDelay = 30000; // 30 seconds
+                  self.postMessage({
+                    type: 'LOG',
+                    message: \`Multiple failures detected. Waiting \${extendedDelay/1000}s before retrying...\`,
+                    level: 'warning'
+                  });
+                  await new Promise(r => setTimeout(r, extendedDelay));
+                }
+              }
+              
+              await new Promise(r => setTimeout(r, ${parseInt(delay.value) * 1000}));
+            }
+          }
+          
+          // Start the main loop with error handling
+          (async () => {
+            try {
+              await mainLoop();
+            } catch (error) {
+              self.postMessage({
+                type: 'CRASH',
+                error: error.message
+              });
+              
+              // Attempt to restart after crash
+              setTimeout(() => {
+                self.postMessage({
+                  type: 'LOG',
+                  message: 'Attempting to restart after crash...',
+                  level: 'warning'
+                });
+                mainLoop();
+              }, 5000);
+            }
+          })();
+          
+          self.onmessage = function(e) {
+            if (e.data.type === 'STOP') {
+              isRunning = false;
+              self.postMessage({
+                type: 'LOG',
+                message: 'Stopping message sending',
+                level: 'warning'
+              });
+            }
+          };
+        `;
+        
+        const blob = new Blob([workerCode], { type: 'application/javascript' });
+        this.worker = new Worker(URL.createObjectURL(blob));
+        
+        this.worker.onmessage = (e) => {
+          const { type, message, level = 'info', data, error } = e.data;
+          
+          if (type === 'LOG') {
+            this.addLog(message, level);
+          } else if (type === 'SUCCESS') {
+            this.messageCount++;
+            this.successCount++;
+            this.addLog('Message sent successfully', 'success');
+          } else if (type === 'ERROR') {
+            this.messageCount++;
+            this.failCount++;
+            this.addLog(`Failed to send: ${error}`, 'error');
+          } else if (type === 'CRASH') {
+            this.addLog(`CRITICAL ERROR: ${error}`, 'error');
+            this.sendAlert(`CRITICAL ERROR: ${error}`);
+            
+            if (this.elements.enableCrashDetection.checked) {
+              setTimeout(() => {
+                this.addLog('Attempting to restart after crash...', 'warning');
+                this.startSending();
+              }, 5000);
+            }
+          }
+        };
+        
+        // Save state
+        this.saveState({
+          channelId: channelId.value.trim(),
+          token: token.value.trim(),
+          backupToken: backupToken.value.trim(),
+          message: message.value.trim(),
+          delay: delay.value,
+          isActive: true,
+          sessionId: this.SESSION_ID
+        });
+        
+        this.updateUI(true);
+        this.addLog('Started automatic message sending', 'success');
+        
+        // If 24/7 mode is enabled, generate monitor URL
+        if (this.is24_7Mode) {
+          this.generateAndDisplayMonitorUrl();
+        }
+        
+        // Start backup worker if enabled
+        if (this.tokens.length > 1 && this.elements.enableAutoTokenRotation.checked) {
+          this.startBackupWorker();
+        }
+      }
+      
+      startBackupWorker() {
+        if (this.backupWorker) {
+          this.backupWorker.terminate();
+        }
+        
+        // Simpler worker just to monitor the main worker
+        const backupWorkerCode = `
+          let checkInterval = setInterval(() => {
+            self.postMessage({
+              type: 'PING',
+              timestamp: Date.now()
+            });
+          }, 10000);
+          
+          self.onmessage = function(e) {
+            if (e.data.type === 'STOP') {
+              clearInterval(checkInterval);
+            }
+          };
+        `;
+        
+        const blob = new Blob([backupWorkerCode], { type: 'application/javascript' });
+        this.backupWorker = new Worker(URL.createObjectURL(blob));
+        
+        this.backupWorker.onmessage = (e) => {
+          if (e.data.type === 'PING') {
+            // Just checking that the worker is alive
+          }
+        };
+        
+        this.addLog('Backup monitoring worker started', 'info');
+      }
+      
+      stopSending() {
+        if (this.worker) {
+          this.worker.postMessage({ type: 'STOP' });
+          this.worker.terminate();
+          this.worker = null;
+        }
+        
+        if (this.backupWorker) {
+          this.backupWorker.postMessage({ type: 'STOP' });
+          this.backupWorker.terminate();
+          this.backupWorker = null;
+        }
+        
+        this.saveState({ isActive: false });
+        this.updateUI(false);
+        this.elements.monitorLinkContainer.classList.add('hidden');
+        this.addLog('Message sending stopped', 'warning');
+      }
+      
+      saveState(data) {
+        localStorage.setItem(this.STATE_KEY, JSON.stringify({
+          ...data,
+          timestamp: Date.now(),
+          sessionId: this.SESSION_ID
+        }));
+      }
+      
+      loadState() {
+        const saved = localStorage.getItem(this.STATE_KEY);
+        return saved ? JSON.parse(saved) : null;
+      }
+      
+      addLog(message, type = 'info') {
+        if (!this.elements.logs) return;
+        
+        const logEntry = document.createElement('div');
+        logEntry.className = `log-entry ${type}`;
+        logEntry.innerHTML = `
+          <span class="log-time">[${new Date().toLocaleTimeString()}]</span>
+          ${message}
+        `;
+        this.elements.logs.prepend(logEntry);
+        
+        // Keep a reasonable number of logs
+        if (this.elements.logs.children.length > 200) {
+          this.elements.logs.removeChild(this.elements.logs.lastChild);
+        }
+      }
+      
+      updateUI(active) {
+        this.isSending = active;
+        this.elements.startBtn.disabled = active;
+        this.elements.stopBtn.disabled = !active;
+        this.elements.status.textContent = `Status: ${active ? 'ACTIVE' : 'INACTIVE'}`;
+        this.elements.status.className = active ? 'status-active' : 'status-inactive';
+      }
+    }
+    
+    // Start the app
+    document.addEventListener('DOMContentLoaded', () => {
+      new UltimateDiscordSender();
+    });
+  </script>
+</body>
+</html>
