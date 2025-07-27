@@ -132,331 +132,391 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>إرسال رسائل Discord تلقائي</h1>
-    
-    <div class="form-group">
-      <label for="channelId">معرف القناة:</label>
-      <input type="text" id="channelId" placeholder="123456789">
-    </div>
-    
-    <div class="form-group">
-      <label for="token">توكن الديسكورد:</label>
-      <input type="password" id="token" placeholder="توكن البوت أو الحساب">
-    </div>
-    
-    <div class="form-group">
-      <label for="message">محتوى الرسالة:</label>
-      <textarea id="message" placeholder="اكتب الرسالة هنا..."></textarea>
-    </div>
-    
-    <div class="form-group">
-      <label for="delay">المدة بين الرسائل (ثواني):</label>
-      <input type="number" id="delay" value="5" min="1">
-    </div>
-    
-    <div class="form-group">
-      <label for="retries">عدد المحاولات عند الفشل:</label>
-      <select id="retries">
-        <option value="0">لا تحاول مجدداً</option>
-        <option value="1">محاولة واحدة</option>
-        <option value="2" selected>محاولتين</option>
-        <option value="3">3 محاولات</option>
-        <option value="5">5 محاولات</option>
-      </select>
-    </div>
-    
-    <div class="button-group">
-      <button id="startBtn">بدء الإرسال</button>
-      <button id="stopBtn" disabled>إيقاف</button>
-    </div>
-    
-    <div id="status" class="status-inactive">
-      الحالة: غير نشط
-    </div>
-    
-    <div id="logs"></div>
+  <div class="container" id="appContainer">
+    <!-- سيتم إنشاء المحتوى ديناميكياً بواسطة JavaScript -->
   </div>
 
   <script>
     // ==========================================
-    // نظام الإدارة الأساسي
+    // نظام التطبيق الديناميكي
     // ==========================================
     
-    const STATE_KEY = 'discordSenderProState';
-    let worker = null;
-    let isSending = false;
-    
-    // عناصر واجهة المستخدم
-    const elements = {
-      startBtn: document.getElementById('startBtn'),
-      stopBtn: document.getElementById('stopBtn'),
-      status: document.getElementById('status'),
-      logs: document.getElementById('logs'),
-      inputs: {
-        channelId: document.getElementById('channelId'),
-        token: document.getElementById('token'),
-        message: document.getElementById('message'),
-        delay: document.getElementById('delay'),
-        retries: document.getElementById('retries')
-      }
-    };
-    
-    // ==========================================
-    // الدوال المساعدة
-    // ==========================================
-    
-    function saveState(data) {
-      localStorage.setItem(STATE_KEY, JSON.stringify({
-        ...data,
-        timestamp: Date.now()
-      }));
-    }
-    
-    function loadState() {
-      const saved = localStorage.getItem(STATE_KEY);
-      return saved ? JSON.parse(saved) : null;
-    }
-    
-    function addLog(message, type = 'info') {
-      const logEntry = document.createElement('div');
-      logEntry.className = `log-entry ${type}`;
-      logEntry.innerHTML = `
-        <span class="log-time">[${new Date().toLocaleTimeString()}]</span>
-        ${message}
-      `;
-      elements.logs.prepend(logEntry);
-      
-      // الحفاظ على عدد معقول من السجلات
-      if (elements.logs.children.length > 50) {
-        elements.logs.removeChild(elements.logs.lastChild);
-      }
-    }
-    
-    function updateUI(active) {
-      isSending = active;
-      elements.startBtn.disabled = active;
-      elements.stopBtn.disabled = !active;
-      elements.status.textContent = `الحالة: ${active ? 'نشط' : 'غير نشط'}`;
-      elements.status.className = active ? 'status-active' : 'status-inactive';
-    }
-    
-    // ==========================================
-    // نظام الإرسال الأساسي
-    // ==========================================
-    
-    function startSending() {
-      const { channelId, token, message, delay, retries } = elements.inputs;
-      
-      // التحقق من المدخلات
-      if (!channelId.value.trim() || !token.value.trim() || !message.value.trim()) {
-        addLog('الرجاء ملء جميع الحقول المطلوبة', 'error');
-        return;
-      }
-      
-      // إنشاء Web Worker
-      const workerCode = `
-        let isRunning = true;
-        const config = {
-          channelId: '${channelId.value.trim()}',
-          token: '${token.value.trim()}',
-          message: \`${message.value.trim()}\`,
-          delay: ${parseInt(delay.value) * 1000},
-          retries: ${parseInt(retries.value)}
-        };
+    class DiscordSenderPro {
+      constructor() {
+        this.STATE_KEY = 'discordSenderProState';
+        this.worker = null;
+        this.isSending = false;
+        this.appVersion = '1.0.0';
+        this.autoRecovery = true;
+        this.elements = {};
         
-        async function sendMessage() {
-          let attempts = 0;
-          let lastError;
+        this.initApp();
+      }
+      
+      // تهيئة التطبيق
+      initApp() {
+        this.createUI();
+        this.setupEventListeners();
+        this.restoreSession();
+        
+        // تسجيل معلومات البدء
+        this.addLog(`تم تحميل DISCORD SENDER PRO الإصدار ${this.appVersion}`, 'info');
+        
+        // التحقق التلقائي من التحديثات
+        this.checkForUpdates();
+      }
+      
+      // إنشاء واجهة المستخدم ديناميكياً
+      createUI() {
+        const container = document.getElementById('appContainer');
+        
+        container.innerHTML = `
+          <h1>إرسال رسائل Discord تلقائي</h1>
           
-          while (attempts <= config.retries) {
-            try {
-              const response = await fetch(
-                \`https://discord.com/api/v9/channels/\${config.channelId}/messages\`,
-                {
-                  method: 'POST',
-                  headers: {
-                    'Authorization': config.token,
-                    'Content-Type': 'application/json',
-                    'User-Agent': 'Mozilla/5.0'
-                  },
-                  body: JSON.stringify({
-                    content: config.message
-                  })
-                }
-              );
-              
-              const data = await response.json();
-              
-              if (!response.ok) {
-                throw new Error(data.message || \`HTTP \${response.status}\`);
-              }
-              
-              return {
-                success: true,
-                data: data
-              };
-            } catch (error) {
-              lastError = error;
-              attempts++;
-              if (attempts <= config.retries) {
-                self.postMessage({
-                  type: 'LOG',
-                  message: \`محاولة \${attempts} من \${config.retries}...\`,
-                  level: 'warning'
-                });
-                await new Promise(r => setTimeout(r, 1000));
-              }
-            }
+          <div class="form-group">
+            <label for="channelId">معرف القناة:</label>
+            <input type="text" id="channelId" placeholder="123456789">
+          </div>
+          
+          <div class="form-group">
+            <label for="token">توكن الديسكورد:</label>
+            <input type="password" id="token" placeholder="توكن البوت أو الحساب">
+          </div>
+          
+          <div class="form-group">
+            <label for="message">محتوى الرسالة:</label>
+            <textarea id="message" placeholder="اكتب الرسالة هنا..."></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="delay">المدة بين الرسائل (ثواني):</label>
+            <input type="number" id="delay" value="5" min="1">
+          </div>
+          
+          <div class="form-group">
+            <label for="retries">عدد المحاولات عند الفشل:</label>
+            <select id="retries">
+              <option value="0">لا تحاول مجدداً</option>
+              <option value="1">محاولة واحدة</option>
+              <option value="2" selected>محاولتين</option>
+              <option value="3">3 محاولات</option>
+              <option value="5">5 محاولات</option>
+            </select>
+          </div>
+          
+          <div class="button-group">
+            <button id="startBtn">بدء الإرسال</button>
+            <button id="stopBtn" disabled>إيقاف</button>
+          </div>
+          
+          <div id="status" class="status-inactive">
+            الحالة: غير نشط
+          </div>
+          
+          <div id="logs"></div>
+        `;
+        
+        // تخزين عناصر واجهة المستخدم
+        this.elements = {
+          startBtn: document.getElementById('startBtn'),
+          stopBtn: document.getElementById('stopBtn'),
+          status: document.getElementById('status'),
+          logs: document.getElementById('logs'),
+          inputs: {
+            channelId: document.getElementById('channelId'),
+            token: document.getElementById('token'),
+            message: document.getElementById('message'),
+            delay: document.getElementById('delay'),
+            retries: document.getElementById('retries')
           }
-          
-          throw lastError;
+        };
+      }
+      
+      // إعداد مستمعي الأحداث
+      setupEventListeners() {
+        this.elements.startBtn.addEventListener('click', () => this.startSending());
+        this.elements.stopBtn.addEventListener('click', () => this.stopSending());
+        
+        // التحقق من التوكن عند التغيير
+        this.elements.inputs.token.addEventListener('change', async () => {
+          const token = this.elements.inputs.token.value.trim();
+          if (token) {
+            this.addLog('جارٍ التحقق من صحة التوكن...');
+            const isValid = await this.validateToken(token);
+            this.addLog(isValid ? 'التوكن صالح' : 'التوكن غير صالح', isValid ? 'success' : 'error');
+          }
+        });
+        
+        // استعادة الواجهة عند حدوث خطأ
+        window.addEventListener('error', (event) => {
+          this.addLog(`حدث خطأ: ${event.message}`, 'error');
+          this.autoRecoverUI();
+        });
+      }
+      
+      // استعادة الواجهة تلقائياً
+      autoRecoverUI() {
+        if (this.autoRecovery) {
+          this.addLog('جارٍ استعادة الواجهة تلقائياً...', 'warning');
+          setTimeout(() => {
+            this.createUI();
+            this.setupEventListeners();
+            this.addLog('تم استعادة الواجهة بنجاح', 'success');
+          }, 1000);
+        }
+      }
+      
+      // التحقق من التحديثات
+      checkForUpdates() {
+        // يمكن تنفيذ التحقق من التحديثات هنا
+        setInterval(() => {
+          // هذا مثال فقط، يمكن استبداله بتحقق حقيقي من الخادم
+          if (Math.random() < 0.1) { // 10% فرصة لاكتشاف تحديث (لأغراض العرض)
+            this.addLog('يتوفر تحديث جديد. جارٍ التحديث التلقائي...', 'warning');
+            this.updateApp();
+          }
+        }, 30000); // التحقق كل 30 ثانية
+      }
+      
+      // تحديث التطبيق تلقائياً
+      updateApp() {
+        // في الواقع الفعلي، سيتم جلب الكود الجديد من الخادم
+        this.addLog('جارٍ تطبيق التحديثات...', 'info');
+        
+        // إعادة تحميل الواجهة مع التحديثات
+        setTimeout(() => {
+          this.createUI();
+          this.setupEventListeners();
+          this.addLog('تم تحديث التطبيق بنجاح', 'success');
+        }, 1500);
+      }
+      
+      // ==========================================
+      // نظام الإرسال الأساسي
+      // ==========================================
+      
+      startSending() {
+        const { channelId, token, message, delay, retries } = this.elements.inputs;
+        
+        // التحقق من المدخلات
+        if (!channelId.value.trim() || !token.value.trim() || !message.value.trim()) {
+          this.addLog('الرجاء ملء جميع الحقول المطلوبة', 'error');
+          return;
         }
         
-        async function mainLoop() {
-          while (isRunning) {
-            try {
-              const result = await sendMessage();
-              self.postMessage({
-                type: 'LOG',
-                message: 'تم إرسال الرسالة بنجاح',
-                level: 'success',
-                data: result.data
-              });
-            } catch (error) {
-              self.postMessage({
-                type: 'LOG',
-                message: \`فشل الإرسال: \${error.message}\`,
-                level: 'error'
-              });
+        // إنشاء Web Worker
+        const workerCode = `
+          let isRunning = true;
+          const config = {
+            channelId: '${channelId.value.trim()}',
+            token: '${token.value.trim()}',
+            message: \`${message.value.trim()}\`,
+            delay: ${parseInt(delay.value) * 1000},
+            retries: ${parseInt(retries.value)}
+          };
+          
+          async function sendMessage() {
+            let attempts = 0;
+            let lastError;
+            
+            while (attempts <= config.retries) {
+              try {
+                const response = await fetch(
+                  \`https://discord.com/api/v9/channels/\${config.channelId}/messages\`,
+                  {
+                    method: 'POST',
+                    headers: {
+                      'Authorization': config.token,
+                      'Content-Type': 'application/json',
+                      'User-Agent': 'Mozilla/5.0'
+                    },
+                    body: JSON.stringify({
+                      content: config.message
+                    })
+                  }
+                );
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                  throw new Error(data.message || \`HTTP \${response.status}\`);
+                }
+                
+                return {
+                  success: true,
+                  data: data
+                };
+              } catch (error) {
+                lastError = error;
+                attempts++;
+                if (attempts <= config.retries) {
+                  self.postMessage({
+                    type: 'LOG',
+                    message: \`محاولة \${attempts} من \${config.retries}...\`,
+                    level: 'warning'
+                  });
+                  await new Promise(r => setTimeout(r, 1000));
+                }
+              }
             }
             
-            await new Promise(r => setTimeout(r, config.delay));
+            throw lastError;
           }
-        }
+          
+          async function mainLoop() {
+            while (isRunning) {
+              try {
+                const result = await sendMessage();
+                self.postMessage({
+                  type: 'LOG',
+                  message: 'تم إرسال الرسالة بنجاح',
+                  level: 'success',
+                  data: result.data
+                });
+              } catch (error) {
+                self.postMessage({
+                  type: 'LOG',
+                  message: \`فشل الإرسال: \${error.message}\`,
+                  level: 'error'
+                });
+              }
+              
+              await new Promise(r => setTimeout(r, config.delay));
+            }
+          }
+          
+          self.onmessage = function(e) {
+            if (e.data.type === 'STOP') {
+              isRunning = false;
+              self.postMessage({
+                type: 'LOG',
+                message: 'تم إيقاف الإرسال',
+                level: 'warning'
+              });
+            }
+          };
+          
+          mainLoop();
+        `;
         
-        self.onmessage = function(e) {
-          if (e.data.type === 'STOP') {
-            isRunning = false;
-            self.postMessage({
-              type: 'LOG',
-              message: 'تم إيقاف الإرسال',
-              level: 'warning'
-            });
+        const blob = new Blob([workerCode], { type: 'application/javascript' });
+        this.worker = new Worker(URL.createObjectURL(blob));
+        
+        this.worker.onmessage = (e) => {
+          const { type, message, level = 'info', data } = e.data;
+          
+          if (type === 'LOG') {
+            this.addLog(message, level);
+            
+            if (level === 'error') {
+              console.error('Error:', message, data);
+            }
           }
         };
         
-        mainLoop();
-      `;
-      
-      const blob = new Blob([workerCode], { type: 'application/javascript' });
-      worker = new Worker(URL.createObjectURL(blob));
-      
-      worker.onmessage = function(e) {
-        const { type, message, level = 'info', data } = e.data;
+        // حفظ الحالة
+        this.saveState({
+          channelId: channelId.value.trim(),
+          token: token.value.trim(),
+          message: message.value.trim(),
+          delay: delay.value,
+          retries: retries.value,
+          isActive: true
+        });
         
-        if (type === 'LOG') {
-          addLog(message, level);
+        this.updateUI(true);
+        this.addLog('بدأ الإرسال التلقائي', 'success');
+      }
+      
+      stopSending() {
+        if (this.worker) {
+          this.worker.postMessage({ type: 'STOP' });
+          this.worker.terminate();
+          this.worker = null;
+        }
+        
+        this.saveState({ isActive: false });
+        this.updateUI(false);
+        this.addLog('تم إيقاف الإرسال', 'warning');
+      }
+      
+      // ==========================================
+      // الدوال المساعدة
+      // ==========================================
+      
+      saveState(data) {
+        localStorage.setItem(this.STATE_KEY, JSON.stringify({
+          ...data,
+          timestamp: Date.now()
+        }));
+      }
+      
+      loadState() {
+        const saved = localStorage.getItem(this.STATE_KEY);
+        return saved ? JSON.parse(saved) : null;
+      }
+      
+      addLog(message, type = 'info') {
+        const logEntry = document.createElement('div');
+        logEntry.className = `log-entry ${type}`;
+        logEntry.innerHTML = `
+          <span class="log-time">[${new Date().toLocaleTimeString()}]</span>
+          ${message}
+        `;
+        this.elements.logs.prepend(logEntry);
+        
+        // الحفاظ على عدد معقول من السجلات
+        if (this.elements.logs.children.length > 50) {
+          this.elements.logs.removeChild(this.elements.logs.lastChild);
+        }
+      }
+      
+      updateUI(active) {
+        this.isSending = active;
+        this.elements.startBtn.disabled = active;
+        this.elements.stopBtn.disabled = !active;
+        this.elements.status.textContent = `الحالة: ${active ? 'نشط' : 'غير نشط'}`;
+        this.elements.status.className = active ? 'status-active' : 'status-inactive';
+      }
+      
+      // التحقق من صحة التوكن
+      async validateToken(token) {
+        try {
+          const response = await fetch('https://discord.com/api/v9/users/@me', {
+            headers: { 'Authorization': token }
+          });
+          return response.ok;
+        } catch (error) {
+          return false;
+        }
+      }
+      
+      // استعادة الجلسة عند التحميل
+      restoreSession() {
+        const state = this.loadState();
+        if (state && state.isActive) {
+          Object.keys(state).forEach(key => {
+            if (this.elements.inputs[key]) {
+              this.elements.inputs[key].value = state[key] || '';
+            }
+          });
           
-          if (level === 'error') {
-            console.error('Error:', message, data);
-          }
+          // تأخير البدء لضمان تحميل كل شيء
+          setTimeout(() => {
+            if (confirm('تم اكتشاف جلسة نشطة. هل تريد استئناف الإرسال؟')) {
+              this.startSending();
+            } else {
+              this.saveState({ isActive: false });
+            }
+          }, 1000);
         }
-      };
-      
-      // حفظ الحالة
-      saveState({
-        channelId: channelId.value.trim(),
-        token: token.value.trim(),
-        message: message.value.trim(),
-        delay: delay.value,
-        retries: retries.value,
-        isActive: true
-      });
-      
-      updateUI(true);
-      addLog('بدأ الإرسال التلقائي', 'success');
-    }
-    
-    function stopSending() {
-      if (worker) {
-        worker.postMessage({ type: 'STOP' });
-        worker.terminate();
-        worker = null;
-      }
-      
-      saveState({ isActive: false });
-      updateUI(false);
-      addLog('تم إيقاف الإرسال', 'warning');
-    }
-    
-    // ==========================================
-    // حلول متقدمة
-    // ==========================================
-    
-    // 1. حل مشكلة CORS البديل
-    function getProxyUrl(url) {
-      // يمكن استبدال هذا بعنوك بروكسي خاص إذا لزم الأمر
-      return url; // إلغاء استخدام البروكسي مؤقتاً
-    }
-    
-    // 2. التحقق من صحة التوكن
-    async function validateToken(token) {
-      try {
-        const response = await fetch('https://discord.com/api/v9/users/@me', {
-          headers: { 'Authorization': token }
-        });
-        return response.ok;
-      } catch (error) {
-        return false;
       }
     }
     
-    // 3. استعادة الجلسة عند التحميل
-    function restoreSession() {
-      const state = loadState();
-      if (state && state.isActive) {
-        Object.keys(state).forEach(key => {
-          if (elements.inputs[key]) {
-            elements.inputs[key].value = state[key] || '';
-          }
-        });
-        
-        // تأخير البدء لضمان تحميل كل شيء
-        setTimeout(() => {
-          if (confirm('تم اكتشاف جلسة نشطة. هل تريد استئناف الإرسال؟')) {
-            startSending();
-          } else {
-            saveState({ isActive: false });
-          }
-        }, 1000);
-      }
-    }
-    
-    // ==========================================
-    // تهيئة التطبيق
-    // ==========================================
-    
-    function init() {
-      restoreSession();
-      
-      // أحداث الأزرار
-      elements.startBtn.addEventListener('click', startSending);
-      elements.stopBtn.addEventListener('click', stopSending);
-      
-      // التحقق من التوكن عند التغيير
-      elements.inputs.token.addEventListener('change', async () => {
-        const token = elements.inputs.token.value.trim();
-        if (token) {
-          addLog('جارٍ التحقق من صحة التوكن...');
-          const isValid = await validateToken(token);
-          addLog(isValid ? 'التوكن صالح' : 'التوكن غير صالح', isValid ? 'success' : 'error');
-        }
-      });
-    }
-    
-    // بدء التطبيق
-    document.addEventListener('DOMContentLoaded', init);
+    // بدء التطبيق عند تحميل الصفحة
+    document.addEventListener('DOMContentLoaded', () => {
+      new DiscordSenderPro();
+    });
   </script>
 </body>
 </html>
