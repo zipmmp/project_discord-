@@ -26,482 +26,25 @@
       background: var(--bg-color);
       color: var(--text-color);
       margin: 0;
-      padding: 0;
-      min-height: 100vh;
+      padding: 20px;
       background-image: 
         radial-gradient(circle at 25% 25%, rgba(88, 101, 242, 0.15) 0%, transparent 50%),
         radial-gradient(circle at 75% 75%, rgba(237, 66, 69, 0.15) 0%, transparent 50%);
-      overflow-x: hidden;
     }
 
     .container {
-      max-width: 900px;
+      max-width: 800px;
       margin: 0 auto;
-      padding: 20px;
-    }
-
-    .player-container {
       background: var(--card-bg);
+      padding: 30px;
       border-radius: 15px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      overflow: hidden;
-      position: relative;
-      margin-top: 30px;
       border: 1px solid var(--border-color);
-    }
-
-    .player-header {
-      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-      padding: 20px;
-      text-align: center;
       position: relative;
       overflow: hidden;
     }
 
-    .player-header::before {
-      content: "";
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(
-        to bottom right,
-        transparent 45%,
-        rgba(255, 255, 255, 0.1) 50%,
-        transparent 55%
-      );
-      animation: shine 3s infinite linear;
-    }
-
-    @keyframes shine {
-      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-    }
-
-    .player-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2rem;
-      margin: 0;
-      position: relative;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-      letter-spacing: 2px;
-    }
-
-    .player-subtitle {
-      font-size: 1rem;
-      margin: 5px 0 0;
-      opacity: 0.8;
-      font-weight: 300;
-    }
-
-    .player-body {
-      padding: 25px;
-    }
-
-    .form-group {
-      margin-bottom: 25px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 10px;
-      font-weight: 700;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      letter-spacing: 1px;
-    }
-
-    input, textarea, select {
-      width: 100%;
-      padding: 15px;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      background-color: var(--input-bg);
-      color: var(--text-color);
-      font-size: 16px;
-      transition: all 0.3s;
-      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
-    }
-
-    input:focus, textarea:focus, select:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.3), inset 0 2px 5px rgba(0, 0, 0, 0.2);
-    }
-
-    textarea {
-      min-height: 120px;
-      resize: vertical;
-      font-family: 'Roboto', sans-serif;
-    }
-
-    button {
-      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-      color: white;
-      border: none;
-      padding: 15px 25px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: bold;
-      transition: all 0.3s;
-      width: 100%;
-      margin-top: 10px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-family: 'Orbitron', sans-serif;
-      box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);
-      position: relative;
-      overflow: hidden;
-    }
-
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(88, 101, 242, 0.6);
-    }
-
-    button:active {
-      transform: translateY(0);
-    }
-
-    button:disabled {
-      background: #555;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .btn-stop {
-      background: linear-gradient(135deg, var(--danger-color), #C0392B);
-      box-shadow: 0 4px 15px rgba(237, 66, 69, 0.4);
-    }
-
-    .btn-stop:hover {
-      box-shadow: 0 6px 20px rgba(237, 66, 69, 0.6);
-    }
-
-    .btn-restart {
-      background: linear-gradient(135deg, var(--warning-color), #E67E22);
-      box-shadow: 0 4px 15px rgba(250, 168, 26, 0.4);
-    }
-
-    .btn-restart:hover {
-      box-shadow: 0 6px 20px rgba(250, 168, 26, 0.6);
-    }
-
-    .btn-clear {
-      background: linear-gradient(135deg, #6c757d, #495057);
-      box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
-    }
-
-    .btn-clear:hover {
-      box-shadow: 0 6px 20px rgba(108, 117, 125, 0.6);
-    }
-
-    #result {
-      background-color: var(--input-bg);
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 20px;
-      min-height: 50px;
-      white-space: pre-wrap;
-      border-left: 4px solid var(--primary-color);
-      font-family: 'Roboto Mono', monospace;
-      font-size: 14px;
-      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
-    }
-
-    .success {
-      color: var(--success-color);
-      border-left-color: var(--success-color);
-    }
-
-    .error {
-      color: var(--danger-color);
-      border-left-color: var(--danger-color);
-    }
-
-    .warning {
-      color: var(--warning-color);
-      border-left-color: var(--warning-color);
-    }
-
-    .flex-row {
-      display: flex;
-      gap: 15px;
-    }
-
-    .flex-row > div {
-      flex: 1;
-    }
-
-    .delay-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .delay-group input {
-      flex: 1;
-    }
-
-    .delay-group span {
-      white-space: nowrap;
-      color: var(--text-secondary);
-    }
-
-    @media (max-width: 768px) {
-      .flex-row {
-        flex-direction: column;
-      }
-
-      .player-title {
-        font-size: 1.5rem;
-      }
-    }
-
-    .spinner {
-      display: none;
-      width: 30px;
-      height: 30px;
-      border: 4px solid rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-      border-top: 4px solid var(--primary-color);
-      animation: spin 1s linear infinite;
-      margin: 20px auto;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .saved-info {
-      color: var(--text-secondary);
-      font-size: 0.8em;
-      margin-top: 5px;
-      font-style: italic;
-    }
-
-    .alert {
-      color: var(--warning-color);
-      background-color: rgba(250, 168, 26, 0.1);
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      border-left: 4px solid var(--warning-color);
-      box-shadow: inset 0 0 10px rgba(250, 168, 26, 0.1);
-    }
-
-    .alert strong {
-      color: var(--warning-color);
-    }
-
-    .copyright {
-      text-align: center;
-      margin-top: 30px;
-      padding: 15px;
-      color: var(--text-secondary);
-      font-size: 0.9em;
-      border-top: 1px solid var(--border-color);
-    }
-
-    .copyright a {
-      color: var(--primary-color);
-      text-decoration: none;
-      transition: all 0.3s;
-    }
-
-    .copyright a:hover {
-      color: white;
-      text-shadow: 0 0 5px var(--primary-color);
-    }
-
-    .log-container {
-      background-color: var(--input-bg);
-      border-radius: 8px;
-      padding: 15px;
-      margin-top: 20px;
-      max-height: 300px;
-      overflow-y: auto;
-      font-family: 'Roboto Mono', monospace;
-      font-size: 14px;
-      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
-    }
-
-    .log-entry {
-      margin-bottom: 5px;
-      padding: 8px;
-      border-bottom: 1px solid var(--border-color);
-      transition: background 0.2s;
-    }
-
-    .log-entry:hover {
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    .log-token {
-      color: var(--warning-color);
-      font-weight: bold;
-    }
-
-    .log-response {
-      color: var(--text-color);
-    }
-
-    .log-timestamp {
-      color: var(--text-secondary);
-      font-size: 0.8em;
-    }
-
-    .button-group {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .button-group button {
-      flex: 1;
-    }
-
-    .status-indicator {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      margin-left: 8px;
-      box-shadow: 0 0 5px currentColor;
-    }
-
-    .status-active {
-      background-color: var(--success-color);
-      color: var(--success-color);
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(59, 165, 92, 0.7); }
-      70% { box-shadow: 0 0 0 10px rgba(59, 165, 92, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(59, 165, 92, 0); }
-    }
-
-    .status-inactive {
-      background-color: var(--text-secondary);
-      color: var(--text-secondary);
-    }
-
-    .status-error {
-      background-color: var(--danger-color);
-      color: var(--danger-color);
-      animation: pulse-red 1.5s infinite;
-    }
-
-    @keyframes pulse-red {
-      0% { box-shadow: 0 0 0 0 rgba(237, 66, 69, 0.7); }
-      70% { box-shadow: 0 0 0 10px rgba(237, 66, 69, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(237, 66, 69, 0); }
-    }
-
-    /* أنماط الجلسة 24/7 */
-    .session-info {
-      margin-top: 25px;
-      padding: 20px;
-      background: var(--input-bg);
-      border-radius: 8px;
-      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
-      border-left: 4px solid var(--primary-color);
-    }
-
-    .session-info h3 {
-      margin-top: 0;
-      color: var(--primary-color);
-      font-family: 'Orbitron', sans-serif;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 10px;
-    }
-
-    .session-id-display {
-      background: rgba(0, 0, 0, 0.3);
-      padding: 10px;
-      border-radius: 5px;
-      font-family: 'Roboto Mono', monospace;
-      word-break: break-all;
-      margin: 10px 0;
-      border: 1px dashed var(--border-color);
-    }
-
-    .session-link {
-      color: var(--primary-color);
-      text-decoration: none;
-      word-break: break-all;
-      display: inline-block;
-      margin: 5px 0;
-      transition: all 0.3s;
-    }
-
-    .session-link:hover {
-      color: white;
-      text-shadow: 0 0 5px var(--primary-color);
-    }
-
-    .copy-btn {
-      background: rgba(88, 101, 242, 0.2);
-      color: var(--primary-color);
-      border: 1px solid var(--primary-color);
-      padding: 5px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 12px;
-      margin-top: 10px;
-      transition: all 0.3s;
-      font-family: 'Orbitron', sans-serif;
-      letter-spacing: 1px;
-    }
-
-    .copy-btn:hover {
-      background: var(--primary-color);
-      color: white;
-      box-shadow: 0 0 10px var(--primary-color);
-    }
-
-    .session-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 15px;
-    }
-
-    .session-status-indicator {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      display: inline-block;
-      box-shadow: 0 0 5px currentColor;
-    }
-
-    .active-indicator {
-      background-color: var(--success-color);
-      color: var(--success-color);
-      animation: pulse 1.5s infinite;
-    }
-
-    .inactive-indicator {
-      background-color: var(--danger-color);
-      color: var(--danger-color);
-    }
-
-    /* تأثيرات الواجهة */
-    .glow-effect {
-      position: relative;
-    }
-
-    .player-container {
-      position: relative;
-      overflow: hidden;
-    }
-
-    .player-container::before {
+    .container::before {
       content: "";
       position: absolute;
       top: -50%;
@@ -518,1148 +61,536 @@
       z-index: 0;
     }
 
-    /* مؤشرات التحميل */
-    .loading-bar {
-      height: 3px;
-      width: 0;
-      background: var(--primary-color);
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 1000;
-      transition: width 0.3s;
-      box-shadow: 0 0 10px var(--primary-color);
+    @keyframes shine {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
     }
 
-    /* إشعارات */
-    .notification {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: var(--card-bg);
-      color: white;
-      padding: 15px 20px;
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--primary-color);
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px rgba(88, 101, 242, 0.5);
+      letter-spacing: 2px;
+      position: relative;
+    }
+
+    .subtitle {
+      font-family: 'Orbitron', sans-serif;
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+      font-size: 1rem;
+      letter-spacing: 1px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+      position: relative;
+      z-index: 1;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--text-secondary);
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 15px;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
       border-radius: 8px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      transform: translateY(100px);
-      opacity: 0;
+      font-size: 16px;
       transition: all 0.3s;
-      z-index: 1000;
-      border-left: 4px solid var(--primary-color);
-      max-width: 300px;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+      font-family: 'Roboto', sans-serif;
     }
 
-    .notification.show {
-      transform: translateY(0);
-      opacity: 1;
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.3), inset 0 2px 5px rgba(0, 0, 0, 0.2);
     }
 
-    .notification.error {
-      border-left-color: var(--danger-color);
+    textarea {
+      min-height: 120px;
+      resize: vertical;
     }
 
-    .notification.success {
+    .button-group {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+      border: none;
+      padding: 15px 25px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: all 0.3s;
+      flex: 1;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-family: 'Orbitron', sans-serif;
+      box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(88, 101, 242, 0.6);
+    }
+
+    button:disabled {
+      background: #555;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+      opacity: 0.7;
+    }
+
+    .btn-stop {
+      background: linear-gradient(135deg, var(--danger-color), #C0392B);
+      box-shadow: 0 4px 15px rgba(237, 66, 69, 0.4);
+    }
+
+    .btn-stop:hover {
+      box-shadow: 0 6px 20px rgba(237, 66, 69, 0.6);
+    }
+
+    #status {
+      padding: 15px;
+      border-radius: 8px;
+      background: var(--input-bg);
+      margin: 20px 0;
+      border-left: 4px solid var(--danger-color);
+      font-weight: bold;
+    }
+
+    #status.active {
       border-left-color: var(--success-color);
     }
 
-    /* نافذة النسخ اليدوي */
-    .manual-copy-modal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: var(--card-bg);
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
-      z-index: 1001;
-      width: 90%;
-      max-width: 400px;
-      border: 1px solid var(--primary-color);
+    .status-text {
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 1px;
     }
 
-    .manual-copy-modal h3 {
-      margin-top: 0;
+    .active {
+      color: var(--success-color);
+    }
+
+    .inactive {
+      color: var(--danger-color);
+    }
+
+    #logs {
+      max-height: 300px;
+      overflow-y: auto;
+      background: var(--input-bg);
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .log-entry {
+      margin-bottom: 10px;
+      padding: 10px;
+      border-bottom: 1px solid var(--border-color);
+      font-family: 'Roboto Mono', monospace;
+      font-size: 14px;
+    }
+
+    .log-time {
+      color: var(--text-secondary);
+      font-size: 0.8em;
+      margin-bottom: 5px;
+    }
+
+    .log-message {
+      margin-bottom: 5px;
+    }
+
+    .log-details {
+      background: rgba(0,0,0,0.3);
+      padding: 8px;
+      border-radius: 5px;
+      margin-top: 5px;
+      font-size: 0.9em;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .success-log {
+      color: var(--success-color);
+    }
+
+    .error-log {
+      color: var(--danger-color);
+    }
+
+    .warning {
+      background: rgba(250, 168, 26, 0.1);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--warning-color);
       color: var(--warning-color);
     }
 
-    .manual-copy-modal input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      background: var(--input-bg);
-      color: white;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
+    .warning strong {
+      color: var(--warning-color);
     }
 
-    .manual-copy-modal button {
-      margin-top: 10px;
-      width: auto;
-      padding: 8px 15px;
-    }
-
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      z-index: 1000;
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 1.8rem;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
     }
 
     /* تأثيرات النيون */
     .neon-text {
-      text-shadow: 0 0 5px var(--primary-color), 0 0 10px var(--primary-color), 0 0 15px var(--primary-color);
       animation: neon-glow 1.5s ease-in-out infinite alternate;
     }
 
     @keyframes neon-glow {
       from {
-        text-shadow: 0 0 5px var(--primary-color), 0 0 10px var(--primary-color), 0 0 15px var(--primary-color);
+        text-shadow: 0 0 5px var(--primary-color), 0 0 10px var(--primary-color);
       }
       to {
-        text-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color), 0 0 30px var(--primary-color);
+        text-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color);
       }
-    }
-
-    /* نافذة تأكيد الحذف */
-    .confirm-modal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: var(--card-bg);
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 0 25px rgba(0, 0, 0, 0.8);
-      z-index: 1001;
-      width: 90%;
-      max-width: 400px;
-      border: 1px solid var(--danger-color);
-      text-align: center;
-    }
-
-    .confirm-modal h3 {
-      margin-top: 0;
-      color: var(--danger-color);
-      font-family: 'Orbitron', sans-serif;
-    }
-
-    .confirm-modal p {
-      margin-bottom: 25px;
-      color: var(--text-secondary);
-    }
-
-    .confirm-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-    }
-
-    .confirm-buttons button {
-      width: auto;
-      padding: 10px 25px;
-    }
-
-    .confirm-btn {
-      background: linear-gradient(135deg, var(--danger-color), #C0392B);
-    }
-
-    .cancel-btn {
-      background: linear-gradient(135deg, #6c757d, #495057);
     }
   </style>
 </head>
 <body>
-  <div class="loading-bar" id="loadingBar"></div>
-
-  <!-- واجهة الأداة الرئيسية -->
-  <div class="container tool-container" id="toolContainer">
-    <div class="player-container glow-effect">
-      <div class="player-header">
-        <h1 class="player-title">DISCORD SENDER 24/7</h1>
-        <p class="player-subtitle">I'M READY TO SEND MESSAGES 24 HOURS!</p>
-      </div>
-
-      <div class="player-body">
-        <div class="alert">
-          <strong>WARNING:</strong> استخدام توكن الحساب الشخصي قد يؤدي إلى حظر حسابك من Discord. استخدم هذه الأداة بحذر ومسؤولية.
-        </div>
-
-        <div class="form-group">
-          <label for="channelId">Channel IDs (مفصولة بفواصل):</label>
-          <input id="channelId" type="text" placeholder="123456789, 987654321, 112233445" />
-          <div class="saved-info" id="channelId-saved"></div>
-        </div>
-
-        <div class="form-group">
-          <label for="token">Discord Token:</label>
-          <input id="token" type="password" placeholder="أدخل توكن حسابك الشخصي" />
-          <div id="tokenStatus" class="token-status token-checking" style="display: none;">جارٍ التحقق من صحة التوكن...</div>
-          <div class="saved-info" id="token-saved"></div>
-        </div>
-
-        <div class="form-group">
-          <label for="message">Message Content:</label>
-          <textarea id="message" placeholder="أدخل الرسالة هنا"></textarea>
-          <div class="saved-info" id="message-saved"></div>
-        </div>
-
-        <div class="form-group">
-          <label for="delay">Delay Between Messages (seconds):</label>
-          <div class="delay-group">
-            <input id="delay" type="number" value="5" min="1" max="60" step="1" />
-            <span>seconds</span>
-          </div>
-          <div class="saved-info" id="delay-saved"></div>
-        </div>
-
-        <div class="button-group">
-          <button id="sendButton" onclick="start24_7Session()">
-            <span id="sendButtonText">START 24/7 SENDING</span>
-          </button>
-          <button id="stopButton" onclick="showResetConfirmation()" class="btn-stop" style="display: none;">STOP & RESET ALL</button>
-          <button id="restartButton" onclick="restartSending()" class="btn-restart" style="display: none;">RESTART</button>
-        </div>
-
-        <div id="sessionInfo" class="session-info" style="display: none;">
-          <h3>ACTIVE SESSION INFO</h3>
-          <p><strong>Status:</strong> <span class="session-status"><span id="sessionStatusIndicator" class="session-status-indicator inactive-indicator"></span><span id="sessionStatusText">INACTIVE</span></span></p>
-          <p><strong>Session ID:</strong></p>
-          <div id="sessionIdDisplay" class="session-id-display"></div>
-          <p><strong>Session URL:</strong></p>
-          <a id="sessionLink" class="session-link" target="_blank"></a>
-          <button onclick="copySessionLink()" class="copy-btn">COPY URL</button>
-        </div>
-
-        <button id="clearLogButton" onclick="clearLog()" class="btn-clear">CLEAR LOG</button>
-
-        <div id="spinner" class="spinner"></div>
-
-        <h3>RESULT:</h3>
-        <pre id="result"></pre>
-
-        <h3>SENDING LOG:</h3>
-        <div class="log-container" id="logContainer">
-          <!-- سيتم إضافة سجلات الإرسال هنا -->
-        </div>
-
-        <div class="form-group" style="margin-top: 30px;">
-          <h3>STATISTICS:</h3>
-          <p>Messages Sent: <span id="sentCount">0</span></p>
-          <p>Failed Messages: <span id="failedCount">0</span></p>
-          <p>Target Channels: <span id="channelsCount">0</span></p>
-          <p>Status: <span id="status">INACTIVE</span> <span id="statusIndicator" class="status-indicator status-inactive"></span></p>
-        </div>
-      </div>
+  <div class="container">
+    <h1 class="neon-text">DISCORD SENDER 24/7</h1>
+    <p class="subtitle">I'M READY TO SEND MESSAGES 24 HOURS!</p>
+    
+    <div class="warning">
+      <strong>WARNING:</strong> استخدام توكن الحساب الشخصي قد يؤدي إلى حظر حسابك من Discord. استخدم هذه الأداة بحذر ومسؤولية.
     </div>
-
-    <div class="copyright">
-      جميع الحقوق محفوظة &copy; 2025 | zamasu-null
+    
+    <div class="form-group">
+      <label for="channelId">Channel ID:</label>
+      <input type="text" id="channelId" placeholder="123456789">
     </div>
+    
+    <div class="form-group">
+      <label for="token">Discord Token:</label>
+      <input type="password" id="token" placeholder="أدخل توكن حسابك الشخصي">
+    </div>
+    
+    <div class="form-group">
+      <label for="message">Message Content:</label>
+      <textarea id="message" placeholder="أدخل الرسالة هنا"></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label for="delay">Delay Between Messages (seconds):</label>
+      <input type="number" id="delay" value="5" min="1" max="60">
+    </div>
+    
+    <div class="button-group">
+      <button id="startBtn">START SENDING</button>
+      <button id="stopBtn" class="btn-stop" disabled>STOP SENDING</button>
+    </div>
+    
+    <div id="status">
+      Status: <span class="status-text inactive">INACTIVE</span>
+    </div>
+    
+    <div id="logs"></div>
   </div>
 
-  <div id="notification" class="notification"></div>
-
   <script>
+    // إنشاء Web Worker
+    const workerCode = `
+      let isSending = false;
+      let abortController = null;
+      let delay = 5000;
+      
+      self.onmessage = async function(e) {
+        const { type, data } = e.data;
+        
+        if (type === 'START') {
+          isSending = true;
+          const { channelId, token, message, delay: newDelay } = data;
+          delay = newDelay * 1000;
+          
+          while (isSending) {
+            abortController = new AbortController();
+            
+            try {
+              const response = await fetch(\`https://discord.com/api/v9/channels/\${channelId}/messages\`, {
+                method: 'POST',
+                headers: {
+                  'Authorization': token,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content: message }),
+                signal: abortController.signal
+              });
+              
+              const result = await response.json();
+              self.postMessage({
+                type: 'LOG',
+                data: {
+                  status: 'success',
+                  message: 'Message sent successfully',
+                  response: result,
+                  timestamp: new Date().toLocaleTimeString()
+                }
+              });
+            } catch (error) {
+              self.postMessage({
+                type: 'LOG',
+                data: {
+                  status: 'error',
+                  message: 'Error sending message',
+                  error: error.message,
+                  timestamp: new Date().toLocaleTimeString()
+                }
+              });
+              
+              if (error.name === 'AbortError') {
+                self.postMessage({
+                  type: 'STOPPED'
+                });
+                break;
+              }
+            }
+            
+            if (isSending) {
+              await new Promise(resolve => setTimeout(resolve, delay));
+            }
+          }
+        }
+        
+        if (type === 'STOP') {
+          isSending = false;
+          if (abortController) {
+            abortController.abort();
+          }
+        }
+      };
+    `;
+
+    // إنشاء blob من كود الworker
+    const blob = new Blob([workerCode], { type: 'application/javascript' });
+    const workerUrl = URL.createObjectURL(blob);
+    const worker = new Worker(workerUrl);
+
+    // عناصر DOM
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const statusText = document.querySelector('#status .status-text');
+    const logsDiv = document.getElementById('logs');
+
     // حالة التطبيق
     let isSending = false;
-    let sentMessages = 0;
-    let failedMessages = 0;
-    let abortController = null;
-    let currentChannelIndex = 0;
-    let sendingInterval = null;
-    let activeSessionId = null;
-    let sessionData = {};
-    let invalidTokens = JSON.parse(localStorage.getItem('invalidTokens')) || [];
-    let sessionSyncInterval = null;
 
-    // تحميل الإعدادات المحفوظة عند بدء التشغيل
-    document.addEventListener('DOMContentLoaded', function() {
-      // إضافة مستمعات التغيير لحفظ الإعدادات تلقائياً
-      document.getElementById('channelId').addEventListener('change', saveSettings);
-      document.getElementById('token').addEventListener('change', function() {
-        saveSettings();
-        checkTokenValidity();
+    // IndexedDB
+    let db;
+    const openDB = () => {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open('DiscordSenderDB', 1);
+
+        request.onupgradeneeded = (event) => {
+          const db = event.target.result;
+          if (!db.objectStoreNames.contains('sessions')) {
+            db.createObjectStore('sessions', { keyPath: 'id' });
+          }
+        };
+
+        request.onsuccess = (event) => {
+          db = event.target.result;
+          resolve(db);
+        };
+
+        request.onerror = (event) => {
+          reject(event.target.error);
+        };
       });
-      document.getElementById('message').addEventListener('change', saveSettings);
-      document.getElementById('delay').addEventListener('change', saveSettings);
+    };
 
-      // حماية حقول الإدخال من النسخ/اللصق
-      protectInputs();
+    const saveSession = async (data) => {
+      if (!db) await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('sessions', 'readwrite');
+        const store = tx.objectStore('sessions');
+        store.put({ id: 'current', ...data, lastUpdated: new Date() });
+        tx.oncomplete = resolve;
+        tx.onerror = (event) => reject(event.target.error);
+      });
+    };
 
-      // تحميل أي جلسة نشطة من localStorage
-      loadActiveSession();
+    const loadSession = async () => {
+      if (!db) await openDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('sessions', 'readonly');
+        const store = tx.objectStore('sessions');
+        const request = store.get('current');
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = (event) => reject(event.target.error);
+      });
+    };
 
-      // تحميل الإعدادات
-      loadSettings();
-
-      // بدء مزامنة الجلسة
-      startSessionSync();
-
-      // إظهار شريط التحميل
-      document.getElementById('loadingBar').style.width = '100%';
-      setTimeout(() => {
-        document.getElementById('loadingBar').style.opacity = '0';
-      }, 500);
-    });
-
-    // دالة لتحميل الجلسة النشطة مع تحسينات للاستمرارية
-    function loadActiveSession() {
-      const savedSession = localStorage.getItem('activeDiscordSession');
-      const urlParams = new URLSearchParams(window.location.search);
-      const sessionId = urlParams.get('session');
-
-      if (sessionId) {
-        // إذا كان هناك جلسة في الرابط، نتحقق من تطابقها مع الجلسة المحفوظة
-        if (savedSession) {
-          try {
-            sessionData = JSON.parse(savedSession);
-            if (sessionData.sessionId === sessionId) {
-              activeSessionId = sessionId;
-              
-              // تعبئة الحقول من الجلسة المحفوظة
-              document.getElementById('channelId').value = sessionData.channelId || '';
-              document.getElementById('token').value = sessionData.token || '';
-              document.getElementById('message').value = sessionData.message || '';
-              document.getElementById('delay').value = sessionData.delay || 5;
-              sentMessages = sessionData.sentMessages || 0;
-              failedMessages = sessionData.failedMessages || 0;
-
-              // تحديث الإحصائيات
-              updateStats();
-
-              // عرض معلومات الجلسة
-              showSessionInfo();
-              updateSessionStatus(sessionData.isActive);
-
-              // بدء الإرسال إذا كانت الجلسة نشطة
-              if (sessionData.isActive) {
-                // تأخير بدء الإرسال لضمان تحميل الصفحة بالكامل
-                setTimeout(() => {
-                  startSendingFromSession();
-                }, 1000);
-              }
-              return;
-            }
-          } catch (e) {
-            console.error('Error loading session:', e);
-          }
-        }
-        
-        // إذا لم تكن الجلسة محفوظة محلياً، ننشئ جلسة جديدة بنفس المعرف
-        if (!activeSessionId) {
-          activeSessionId = sessionId;
-          saveSessionData(false);
-          showSessionInfo();
-          updateSessionStatus(false);
-        }
-      } else if (savedSession) {
-        // إذا لم يكن هناك جلسة في الرابط ولكن هناك جلسة محفوظة
-        try {
-          sessionData = JSON.parse(savedSession);
-          activeSessionId = sessionData.sessionId;
-
-          // تعبئة الحقول من الجلسة المحفوظة
-          document.getElementById('channelId').value = sessionData.channelId || '';
-          document.getElementById('token').value = sessionData.token || '';
-          document.getElementById('message').value = sessionData.message || '';
-          document.getElementById('delay').value = sessionData.delay || 5;
-          sentMessages = sessionData.sentMessages || 0;
-          failedMessages = sessionData.failedMessages || 0;
-
-          // تحديث الإحصائيات
-          updateStats();
-
-          // عرض معلومات الجلسة
-          showSessionInfo();
-          updateSessionStatus(sessionData.isActive);
-
-          // بدء الإرسال إذا كانت الجلسة نشطة
-          if (sessionData.isActive) {
-            startSendingFromSession();
-          }
-        } catch (e) {
-          console.error('Error loading session:', e);
-          localStorage.removeItem('activeDiscordSession');
-        }
-      }
-    }
-
-    // دالة لبدء مزامنة الجلسة
-    function startSessionSync() {
-      if (sessionSyncInterval) {
-        clearInterval(sessionSyncInterval);
-      }
-      
-      sessionSyncInterval = setInterval(() => {
-        if (activeSessionId) {
-          const savedSession = localStorage.getItem('activeDiscordSession');
-          if (savedSession) {
-            try {
-              const currentData = JSON.parse(savedSession);
-              if (currentData.sessionId === activeSessionId && currentData.isActive) {
-                // إذا كانت الجلسة لا تزال نشطة في localStorage، نستمر
-                if (!isSending) {
-                  startSendingFromSession();
-                }
-              } else if (isSending) {
-                // إذا كانت الجلسة غير نشطة في localStorage ولكنها نشطة هنا، نتوقف
-                stopSending();
-              }
-            } catch (e) {
-              console.error('Error syncing session:', e);
-            }
-          }
-        }
-      }, 1000);
-    }
-
-    // دالة لعرض نافذة تأكيد الحذف
-    function showResetConfirmation() {
-      // إنشاء عنصر التعتيم
-      const overlay = document.createElement('div');
-      overlay.className = 'modal-overlay';
-      overlay.onclick = () => {
-        document.body.removeChild(overlay);
-        document.body.removeChild(modal);
-      };
-
-      // إنشاء نافذة التأكيد
-      const modal = document.createElement('div');
-      modal.className = 'confirm-modal';
-      modal.innerHTML = `
-        <h3>RESET EVERYTHING?</h3>
-        <p>Are you sure you want to stop sending and reset all data? This will delete all saved settings and session data.</p>
-        <div class="confirm-buttons">
-          <button onclick="resetEverything()" class="confirm-btn">YES, RESET ALL</button>
-          <button onclick="closeModal()" class="cancel-btn">CANCEL</button>
-        </div>
-      `;
-
-      document.body.appendChild(overlay);
-      document.body.appendChild(modal);
-
-      // إضافة الدوال إلى النطاق العام
-      window.closeModal = function() {
-        document.body.removeChild(overlay);
-        document.body.removeChild(modal);
-      };
-    }
-
-    // دالة لإعادة تعيين كل شيء وحذف جميع البيانات
-    function resetEverything() {
-      // إيقاف الإرسال أولاً
-      stopSending();
-
-      // حذف جميع البيانات من localStorage
-      localStorage.removeItem('discordSenderSettings');
-      localStorage.removeItem('activeDiscordSession');
-      localStorage.removeItem('invalidTokens');
-
-      // إعادة تعيين المتغيرات
-      sentMessages = 0;
-      failedMessages = 0;
-      activeSessionId = null;
-      sessionData = {};
-      invalidTokens = [];
-
-      // إعادة تعيين واجهة المستخدم
-      document.getElementById('channelId').value = '';
-      document.getElementById('token').value = '';
-      document.getElementById('message').value = '';
-      document.getElementById('delay').value = '5';
-      document.getElementById('result').textContent = '';
-      document.getElementById('logContainer').innerHTML = '';
-      document.getElementById('sessionInfo').style.display = 'none';
-
-      // تحديث الإحصائيات
-      updateStats();
-
-      // إغلاق النافذة
-      closeModal();
-
-      // إظهار إشعار
-      showNotification("All data has been reset successfully!", false);
-      showResult("تم إعادة تعيين جميع البيانات بنجاح", false);
-    }
-
-    // دالة لعرض الإشعارات
-    function showNotification(message, isError = false) {
-      const notification = document.getElementById('notification');
-      notification.textContent = message;
-      notification.className = isError ? 'notification error' : 'notification success';
-
-      notification.classList.add('show');
-
-      setTimeout(() => {
-        notification.classList.remove('show');
-      }, 3000);
-    }
-
-    // دالة لعرض نافذة النسخ اليدوي
-    function showManualCopyModal(text) {
-      // إزالة أي نافذة موجودة مسبقاً
-      const existingModal = document.querySelector('.manual-copy-modal');
-      if (existingModal) {
-        document.body.removeChild(existingModal);
-      }
-      const existingOverlay = document.querySelector('.modal-overlay');
-      if (existingOverlay) {
-        document.body.removeChild(existingOverlay);
-      }
-
-      // إنشاء عنصر التعتيم
-      const overlay = document.createElement('div');
-      overlay.className = 'modal-overlay';
-      overlay.onclick = () => {
-        document.body.removeChild(overlay);
-        document.body.removeChild(modal);
-      };
-
-      // إنشاء نافذة النسخ اليدوي
-      const modal = document.createElement('div');
-      modal.className = 'manual-copy-modal';
-      modal.innerHTML = `
-        <h3>نسخ الرابط يدوياً</h3>
-        <p>تعذر الوصول إلى الحافظة. يرجى نسخ الرابط التالي يدوياً:</p>
-        <input type="text" value="${text}" id="manualCopyInput" readonly>
-        <button onclick="copyFromModal()" style="background: var(--primary-color)">نسخ</button>
-        <button onclick="closeModal()" style="background: var(--danger-color); margin-left: 10px;">إغلاق</button>
-      `;
-
-      document.body.appendChild(overlay);
-      document.body.appendChild(modal);
-
-      // تحديد النص تلقائياً
-      document.getElementById('manualCopyInput').select();
-
-      // إضافة الدوال إلى النطاق العام
-      window.copyFromModal = function() {
-        const input = document.getElementById('manualCopyInput');
-        input.select();
-        try {
-          document.execCommand('copy');
-          showNotification("تم النسخ بنجاح!", false);
-          closeModal();
-        } catch (err) {
-          showNotification("فشل النسخ، يرجى المحاولة يدوياً", true);
-        }
-      };
-
-      window.closeModal = function() {
-        document.body.removeChild(overlay);
-        document.body.removeChild(modal);
-      };
-    }
-
-    // دالة نسخ الرابط مع حلول بديلة
-    function copySessionLink() {
-      const sessionLink = document.getElementById('sessionLink').href;
-
-      // الطريقة الحديثة باستخدام Clipboard API
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(sessionLink).then(() => {
-          showNotification("Session link copied to clipboard!", false);
-          showResult("تم نسخ رابط الجلسة بنجاح", false);
-        }).catch(err => {
-          console.error('Clipboard API error:', err);
-          fallbackCopyMethod(sessionLink);
-        });
-      } else {
-        // إذا لم يكن Clipboard API متاحاً
-        fallbackCopyMethod(sessionLink);
-      }
-    }
-
-    // طريقة النسخ البديلة
-    function fallbackCopyMethod(text) {
-      const textarea = document.createElement('textarea');
-      textarea.value = text;
-      textarea.style.position = 'fixed'; // خارج الشاشة
-      document.body.appendChild(textarea);
-      textarea.select();
-
+    // تحميل الجلسة عند البدء
+    document.addEventListener('DOMContentLoaded', async () => {
       try {
-        const successful = document.execCommand('copy');
-        if (successful) {
-          showNotification("Session link copied to clipboard!", false);
-          showResult("تم نسخ رابط الجلسة بنجاح", false);
-        } else {
-          showManualCopyModal(text);
-          showResult("تعذر الوصول إلى الحافظة. يرجى نسخ الرابط يدوياً", true);
-        }
-      } catch (err) {
-        showManualCopyModal(text);
-        showResult(`فشل نسخ الرابط: ${err.message}`, true);
-      } finally {
-        document.body.removeChild(textarea);
-      }
-    }
-
-    // دالة لبدء جلسة 24/7
-    function start24_7Session() {
-      if (!validateInputs()) return;
-
-      // إنشاء معرف جلسة فريد إذا لم يكن موجودًا
-      if (!activeSessionId) {
-        activeSessionId = generateSessionId();
-        showNotification("New 24/7 session started!", false);
-        
-        // تحديث الرابط ليشمل معرف الجلسة
-        const newUrl = `${window.location.origin}${window.location.pathname}?session=${activeSessionId}`;
-        window.history.pushState({}, '', newUrl);
-      }
-
-      // حفظ بيانات الجلسة
-      saveSessionData(true);
-
-      // عرض معلومات الجلسة
-      showSessionInfo();
-      updateSessionStatus(true);
-
-      // بدء الإرسال
-      sendMessages();
-    }
-
-    // دالة لحفظ بيانات الجلسة
-    function saveSessionData(isActive) {
-      sessionData = {
-        sessionId: activeSessionId,
-        channelId: document.getElementById("channelId").value.trim(),
-        token: document.getElementById("token").value.trim(),
-        message: document.getElementById("message").value.trim(),
-        delay: parseFloat(document.getElementById("delay").value),
-        isActive: isActive,
-        sentMessages: sentMessages,
-        failedMessages: failedMessages,
-        timestamp: new Date().toISOString()
-      };
-
-      localStorage.setItem('activeDiscordSession', JSON.stringify(sessionData));
-    }
-
-    // دالة لعرض معلومات الجلسة
-    function showSessionInfo() {
-      const sessionInfo = document.getElementById('sessionInfo');
-      const sessionIdDisplay = document.getElementById('sessionIdDisplay');
-      const sessionLink = document.getElementById('sessionLink');
-
-      sessionInfo.style.display = 'block';
-      sessionIdDisplay.textContent = activeSessionId;
-
-      // إنشاء رابط متابعة الجلسة
-      const sessionUrl = `${window.location.origin}${window.location.pathname}?session=${activeSessionId}`;
-      sessionLink.href = sessionUrl;
-      sessionLink.textContent = sessionUrl;
-    }
-
-    // دالة لتحديث حالة الجلسة
-    function updateSessionStatus(isActive) {
-      const statusIndicator = document.getElementById('sessionStatusIndicator');
-      const statusText = document.getElementById('sessionStatusText');
-
-      if (isActive) {
-        statusIndicator.className = 'session-status-indicator active-indicator';
-        statusText.textContent = 'ACTIVE';
-        document.getElementById('sendButtonText').textContent = 'SENDING NOW...';
-      } else {
-        statusIndicator.className = 'session-status-indicator inactive-indicator';
-        statusText.textContent = 'INACTIVE';
-        document.getElementById('sendButtonText').textContent = 'START 24/7 SENDING';
-      }
-    }
-
-    // دالة لإنشاء معرف جلسة عشوائي
-    function generateSessionId() {
-      return 'sess-' + Math.random().toString(36).substring(2, 8) + '-' + Math.random().toString(36).substring(2, 8);
-    }
-
-    // دالة لبدء الإرسال من جلسة محفوظة
-    function startSendingFromSession() {
-      // تعبئة الحقول من بيانات الجلسة
-      document.getElementById('channelId').value = sessionData.channelId || '';
-      document.getElementById('token').value = sessionData.token || '';
-      document.getElementById('message').value = sessionData.message || '';
-      document.getElementById('delay').value = sessionData.delay || 5;
-      sentMessages = sessionData.sentMessages || 0;
-      failedMessages = sessionData.failedMessages || 0;
-
-      // بدء الإرسال
-      sendMessages();
-    }
-
-    // دالة التحقق من صحة التوكن
-    async function checkTokenValidity() {
-      const token = document.getElementById('token').value.trim();
-      const tokenStatus = document.getElementById('tokenStatus');
-
-      if (!token) {
-        tokenStatus.style.display = 'none';
-        return;
-      }
-
-      // التحقق إذا كان التوكن معطلاً
-      if (invalidTokens.includes(token)) {
-        tokenStatus.textContent = "هذا التوكن معطل أو غير صالح للاستخدام";
-        tokenStatus.className = "token-status token-invalid";
-        tokenStatus.style.display = 'block';
-        return;
-      }
-
-      tokenStatus.textContent = "جارٍ التحقق من صحة التوكن...";
-      tokenStatus.className = "token-status token-checking";
-      tokenStatus.style.display = 'block';
-
-      try {
-        const response = await fetch('https://discord.com/api/v9/users/@me', {
-          method: 'GET',
-          headers: {
-            'Authorization': token
-          }
-        });
-
-        if (response.ok) {
-          tokenStatus.textContent = "التوكن صالح وجاهز للاستخدام";
-          tokenStatus.className = "token-status token-valid";
-        } else {
-          tokenStatus.textContent = "التوكن غير صالح أو معطل";
-          tokenStatus.className = "token-status token-invalid";
-
-          // إضافة التوكن إلى قائمة التوكنات المعطلة
-          if (!invalidTokens.includes(token)) {
-            invalidTokens.push(token);
-            localStorage.setItem('invalidTokens', JSON.stringify(invalidTokens));
+        const session = await loadSession();
+        if (session) {
+          document.getElementById('channelId').value = session.channelId || '';
+          document.getElementById('token').value = session.token || '';
+          document.getElementById('message').value = session.message || '';
+          document.getElementById('delay').value = session.delay || 5;
+          
+          if (session.isActive) {
+            startSending();
           }
         }
       } catch (error) {
-        tokenStatus.textContent = "خطأ في التحقق من صحة التوكن";
-        tokenStatus.className = "token-status token-invalid";
+        addLog('Error loading session: ' + error.message, 'error');
       }
-    }
+    });
 
-    // دالة تحميل الإعدادات المحفوظة
-    function loadSettings() {
-      const settings = JSON.parse(localStorage.getItem('discordSenderSettings')) || {};
+    // بدء الإرسال
+    async function startSending() {
+      const channelId = document.getElementById('channelId').value.trim();
+      const token = document.getElementById('token').value.trim();
+      const message = document.getElementById('message').value.trim();
+      const delay = document.getElementById('delay').value;
 
-      if (settings.channelId) {
-        document.getElementById('channelId').value = settings.channelId;
-        document.getElementById('channelId-saved').textContent = 'تم حفظ معرفات القنوات';
+      if (!channelId || !token || !message) {
+        addLog('Please fill all fields', 'error');
+        return;
       }
-
-      if (settings.token) {
-        document.getElementById('token').value = settings.token;
-        document.getElementById('token-saved').textContent = 'تم حفظ التوكن';
-        checkTokenValidity();
-      }
-
-      if (settings.message) {
-        document.getElementById('message').value = settings.message;
-        document.getElementById('message-saved').textContent = 'تم حفظ الرسالة';
-      }
-
-      if (settings.delay !== undefined) {
-        document.getElementById('delay').value = settings.delay;
-        document.getElementById('delay-saved').textContent = 'تم حفظ المدة بين الرسائل';
-      }
-    }
-
-    // دالة حفظ الإعدادات
-    function saveSettings() {
-      const settings = {
-        channelId: document.getElementById('channelId').value.trim(),
-        token: document.getElementById('token').value.trim(),
-        message: document.getElementById('message').value.trim(),
-        delay: parseFloat(document.getElementById('delay').value)
-      };
-
-      localStorage.setItem('discordSenderSettings', JSON.stringify(settings));
-
-      // تحديث رسائل الحفظ
-      document.getElementById('channelId-saved').textContent = settings.channelId ? 'تم حفظ معرفات القنوات' : '';
-      document.getElementById('token-saved').textContent = settings.token ? 'تم حفظ التوكن' : '';
-      document.getElementById('message-saved').textContent = settings.message ? 'تم حفظ الرسالة' : '';
-      document.getElementById('delay-saved').textContent = 'تم حفظ المدة بين الرسائل';
-    }
-
-    // دالة لإضافة سجل جديد
-    function addLogEntry(token, responseBody) {
-      const logContainer = document.getElementById('logContainer');
-      const logEntry = document.createElement('div');
-      logEntry.className = 'log-entry';
-
-      const timestamp = new Date().toLocaleTimeString();
-      const maskedToken = token.substring(0, 10) + '*****' + token.substring(token.length - 5);
-
-      logEntry.innerHTML = `
-        <div class="log-timestamp">[${timestamp}]</div>
-        <div><span class="log-token">${maskedToken}:</span> <span class="log-response">${JSON.stringify(responseBody)}</span></div>
-      `;
-
-      logContainer.prepend(logEntry);
-
-      // الحفاظ على عدد معقول من السجلات
-      if (logContainer.children.length > 50) {
-        logContainer.removeChild(logContainer.lastChild);
-      }
-    }
-
-    // دالة لمسح السجل
-    function clearLog() {
-      document.getElementById('logContainer').innerHTML = '';
-      showNotification("Log cleared successfully!", false);
-    }
-
-    function updateStats(channels = 0) {
-      document.getElementById('sentCount').textContent = sentMessages;
-      document.getElementById('failedCount').textContent = failedMessages;
-      document.getElementById('channelsCount').textContent = channels;
-
-      // تحديث بيانات الجلسة إذا كانت نشطة
-      if (activeSessionId) {
-        saveSessionData(isSending);
-      }
-    }
-
-    function showLoading(show) {
-      const spinner = document.getElementById('spinner');
-      const sendButton = document.getElementById('sendButton');
-      const stopButton = document.getElementById('stopButton');
-      const restartButton = document.getElementById('restartButton');
-      const statusIndicator = document.getElementById('statusIndicator');
-
-      if (show) {
-        spinner.style.display = 'block';
-        sendButton.style.display = 'none';
-        stopButton.style.display = 'block';
-        restartButton.style.display = 'none';
-        sendButton.disabled = true;
-        statusIndicator.className = 'status-indicator status-active';
-        document.getElementById('status').textContent = 'SENDING...';
-      } else {
-        spinner.style.display = 'none';
-        sendButton.style.display = 'block';
-        stopButton.style.display = 'none';
-        restartButton.style.display = 'none';
-        sendButton.disabled = false;
-        statusIndicator.className = 'status-indicator status-inactive';
-        document.getElementById('status').textContent = 'INACTIVE';
-      }
-    }
-
-    function showResult(message, isError = false) {
-      const resultElement = document.getElementById('result');
-      resultElement.textContent = message;
-      resultElement.className = isError ? 'error' : 'success';
-
-      // تحديث حالة الإرسال
-      const statusIndicator = document.getElementById('statusIndicator');
-      document.getElementById('status').textContent = isError ? 'ERROR' : 'COMPLETED';
-      statusIndicator.className = isError ? 'status-indicator status-error' : 'status-indicator status-inactive';
-    }
-
-    function validateInputs() {
-      const channelIdsInput = document.getElementById("channelId").value.trim();
-      const token = document.getElementById("token").value.trim();
-      const message = document.getElementById("message").value.trim();
-      const delay = parseFloat(document.getElementById("delay").value);
-
-      if (!channelIdsInput) {
-        showResult("الرجاء إدخال Channel IDs!", true);
-        return false;
-      }
-
-      const channelIds = channelIdsInput.split(',').map(id => id.trim()).filter(id => id);
-
-      if (channelIds.length === 0) {
-        showResult("الرجاء إدخال Channel IDs صحيحة مفصولة بفواصل!", true);
-        return false;
-      }
-
-      if (!token) {
-        showResult("الرجاء إدخال توكن الحساب!", true);
-        return false;
-      }
-
-      // التحقق من أن التوكن غير معطل
-      if (invalidTokens.includes(token)) {
-        showResult("هذا التوكن معطل أو غير صالح للاستخدام!", true);
-        return false;
-      }
-
-      if (!message) {
-        showResult("الرجاء إدخال رسالة", true);
-        return false;
-      }
-
-      if (message.length > 2000) {
-        showResult("الرسالة طويلة جداً! الحد الأقصى 2000 حرف", true);
-        return false;
-      }
-
-      if (delay < 1 || isNaN(delay)) {
-        showResult("المدة بين الرسائل يجب أن تكون ثانية واحدة على الأقل", true);
-        return false;
-      }
-
-      return true;
-    }
-
-    async function sendSingleMessage(channelId, token, message) {
-      try {
-        abortController = new AbortController();
-
-        const response = await fetch(`https://discord.com/api/v9/channels/${channelId}/messages`, {
-          method: 'POST',
-          headers: {
-            'Authorization': token,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ content: message }),
-          signal: abortController.signal
-        });
-
-        const responseData = await response.json();
-
-        // إضافة السجل
-        addLogEntry(token, responseData);
-
-        if (response.status === 200 || response.status === 201) {
-          return true;
-        } else {
-          console.error('Error from Discord API:', responseData);
-
-          // إذا كان الخطأ بسبب توكن غير صالح، نضيفه إلى القائمة
-          if (response.status === 401) {
-            if (!invalidTokens.includes(token)) {
-              invalidTokens.push(token);
-              localStorage.setItem('invalidTokens', JSON.stringify(invalidTokens));
-              document.getElementById('tokenStatus').textContent = "هذا التوكن معطل أو غير صالح للاستخدام";
-              document.getElementById('tokenStatus').className = "token-status token-invalid";
-            }
-          }
-
-          return false;
-        }
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          console.error('Error sending message:', err);
-          addLogEntry(token, { error: err.message });
-        }
-        return false;
-      }
-    }
-
-    async function sendMessages() {
-      if (isSending) return;
-
-      if (!validateInputs()) return;
-
-      // حفظ الإعدادات عند بدء الإرسال
-      saveSettings();
-
-      const channelIdsInput = document.getElementById("channelId").value.trim();
-      const token = document.getElementById("token").value.trim();
-      const message = document.getElementById("message").value.trim();
-      const delay = parseFloat(document.getElementById("delay").value) * 1000;
-
-      const channelIds = channelIdsInput.split(',').map(id => id.trim()).filter(id => id);
-      currentChannelIndex = 0;
 
       isSending = true;
-      sentMessages = 0;
-      failedMessages = 0;
-      updateStats(channelIds.length);
-      showLoading(true);
-      document.getElementById('status').textContent = 'SENDING...';
-      document.getElementById('statusIndicator').className = 'status-indicator status-active';
+      statusText.textContent = 'ACTIVE';
+      statusText.className = 'status-text active';
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      document.getElementById('status').style.borderLeftColor = 'var(--success-color)';
 
-      try {
-        while (isSending) {
-          const channelId = channelIds[currentChannelIndex];
+      // حفظ الجلسة
+      await saveSession({
+        channelId,
+        token,
+        message,
+        delay,
+        isActive: true
+      });
 
-          const success = await sendSingleMessage(channelId, token, message);
+      // بدء Worker
+      worker.postMessage({
+        type: 'START',
+        data: { channelId, token, message, delay }
+      });
 
-          if (success) {
-            sentMessages++;
-            showResult(`تم إرسال الرسالة ${sentMessages} إلى القناة ${channelId} بنجاح`);
-          } else {
-            failedMessages++;
-            showResult(`فشل إرسال الرسالة ${sentMessages + failedMessages} إلى القناة ${channelId}`, true);
-
-            // إذا كان التوكن معطلاً، نوقف الإرسال
-            if (invalidTokens.includes(token)) {
-              showResult("تم إيقاف الإرسال بسبب توكن غير صالح", true);
-              stopSending();
-              break;
-            }
-          }
-
-          updateStats(channelIds.length);
-
-          currentChannelIndex = (currentChannelIndex + 1) % channelIds.length;
-
-          if (isSending) {
-            await new Promise(resolve => setTimeout(resolve, delay));
-          }
-        }
-
-        showResult(`تم إيقاف الإرسال. تم إرسال ${sentMessages} رسالة بنجاح و فشل ${failedMessages} رسالة إلى ${channelIds.length} قناة`, true);
-      } catch (err) {
-        showResult("حدث خطأ غير متوقع أثناء الإرسال: " + err.message, true);
-        document.getElementById('restartButton').style.display = 'block';
-      } finally {
-        isSending = false;
-        showLoading(false);
-
-        // تحديث حالة الجلسة
-        if (activeSessionId) {
-          saveSessionData(false);
-          updateSessionStatus(false);
-        }
-      }
+      addLog('Started sending messages', 'success');
     }
 
+    // إيقاف الإرسال
     function stopSending() {
       isSending = false;
-      if (abortController) {
-        abortController.abort();
-      }
-      document.getElementById('status').textContent = 'STOPPED';
-      document.getElementById('statusIndicator').className = 'status-indicator status-inactive';
-      document.getElementById('restartButton').style.display = 'block';
+      statusText.textContent = 'INACTIVE';
+      statusText.className = 'status-text inactive';
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      document.getElementById('status').style.borderLeftColor = 'var(--danger-color)';
 
-      // تحديث حالة الجلسة
-      if (activeSessionId) {
-        saveSessionData(false);
-        updateSessionStatus(false);
-      }
+      // إيقاف Worker
+      worker.postMessage({ type: 'STOP' });
 
-      showNotification("Sending stopped successfully!", false);
-    }
-
-    function restartSending() {
-      // إعادة تعيين الحالة
-      isSending = false;
-      document.getElementById('restartButton').style.display = 'none';
-      document.getElementById('sendButton').style.display = 'block';
-      document.getElementById('status').textContent = 'READY';
-      document.getElementById('statusIndicator').className = 'status-indicator status-inactive';
-
-      // مسح النتيجة السابقة
-      document.getElementById('result').textContent = '';
-      document.getElementById('result').className = '';
-
-      // إذا كانت هناك جلسة نشطة، نبدأ الإرسال منها
-      if (activeSessionId && sessionData.isActive) {
-        startSendingFromSession();
-      }
-
-      showNotification("Sending restarted!", false);
-    }
-
-    // دالة لحماية حقول الإدخال
-    function protectInputs() {
-      const protectedElements = document.querySelectorAll('#channelId, #token, #message');
-
-      protectedElements.forEach(element => {
-        element.classList.add('protected');
-
-        // منع نسخ/لصق/قص النص
-        element.addEventListener('copy', (e) => {
-          e.preventDefault();
-          showResult("إجراء النسخ غير مسموح به", true);
-        });
-
-        element.addEventListener('paste', (e) => {
-          e.preventDefault();
-          showResult("إجراء اللصق غير مسموح به", true);
-        });
-
-        element.addEventListener('cut', (e) => {
-          e.preventDefault();
-          showResult("إجراء القص غير مسموح به", true);
-        });
-
-        // حماية النص من التعديل المباشر
-        element.addEventListener('keydown', (e) => {
-          if (e.ctrlKey && (e.key === 'v' || e.key === 'c' || e.key === 'x')) {
-            e.preventDefault();
-            showResult("إجراءات النسخ/اللصق غير مسموح بها", true);
-          }
-        });
+      // تحديث الجلسة
+      saveSession({
+        isActive: false
       });
+
+      addLog('Stopped sending messages', 'warning');
     }
 
-    // إعادة تحميل الصفحة عند حدوث خطأ غير متوقع
-    window.addEventListener('error', function() {
-      setTimeout(() => {
-        location.reload();
-      }, 3000);
-    });
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') {
-        document.getElementById('token').value = '';
-      }
-    });
-
-    // حماية الصفحة من التفتيش
-    document.addEventListener('contextmenu', function(e) {
-      e.preventDefault();
-    });
-
-    document.addEventListener('keydown', function(e) {
-      // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
-      if (e.key === 'F12' || 
-          (e.ctrlKey && e.shiftKey && e.key === 'I') || 
-          (e.ctrlKey && e.shiftKey && e.key === 'J') || 
-          (e.ctrlKey && e.key === 'U')) {
-        e.preventDefault();
-        showResult("هذا الإجراء غير مسموح به", true);
-      }
-    });
-
-    // يُنشط الموقع كل 5 دقائق لمنع تعطيل الخدمة
-    setInterval(() => {
-      // إرسال طلب fetch للحفاظ على الجلسة نشطة
-      fetch(window.location.href, {
-        method: 'HEAD',
-        cache: 'no-cache',
-        keepalive: true
-      }).catch(() => {
-        // في حالة حدوث خطأ، نقوم بإعادة تحميل الصفحة كاملة
-        window.location.reload();
-      });
+    // إضافة سجل
+    function addLog(message, type = 'info', data = null) {
+      const logEntry = document.createElement('div');
+      logEntry.className = 'log-entry';
       
-      // إذا كانت هناك جلسة إرسال نشطة، نقوم بمزامنة البيانات
-      if (activeSessionId) {
-        const savedSession = localStorage.getItem('activeDiscordSession');
-        if (savedSession) {
-          try {
-            const session = JSON.parse(savedSession);
-            if (session.isActive) {
-              // مزامنة عدد الرسائل المرسلة والفاشلة
-              sentMessages = session.sentMessages || sentMessages;
-              failedMessages = session.failedMessages || failedMessages;
-              updateStats();
-            }
-          } catch (e) {
-            console.error('Error syncing session:', e);
-          }
-        }
+      const time = new Date().toLocaleTimeString();
+      logEntry.innerHTML = \`
+        <div class="log-time">[\${time}]</div>
+        <div class="log-message \${type}-log">\${message}</div>
+      \`;
+      
+      if (data) {
+        const details = document.createElement('div');
+        details.className = 'log-details';
+        details.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+        logEntry.appendChild(details);
       }
-    }, 5 * 60 * 1000); // كل 5 دقائق
+      
+      logsDiv.prepend(logEntry);
+      
+      // الحفاظ على عدد معقول من السجلات
+      if (logsDiv.children.length > 50) {
+        logsDiv.removeChild(logsDiv.lastChild);
+      }
+    }
 
-    // إضافة طلب تنشيط عند تحميل الصفحة لأول مرة
-    window.addEventListener('load', () => {
-      fetch(window.location.href, {
-        method: 'HEAD',
-        cache: 'no-cache'
+    // استقبال رسائل من Worker
+    worker.onmessage = function(e) {
+      const { type, data } = e.data;
+      
+      if (type === 'LOG') {
+        addLog(data.message, data.status, data.error || data.response);
+      }
+      
+      if (type === 'STOPPED') {
+        stopSending();
+      }
+    };
+
+    // أحداث الأزرار
+    startBtn.addEventListener('click', startSending);
+    stopBtn.addEventListener('click', stopSending);
+
+    // Service Worker التسجيل
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(registration => {
+            console.log('ServiceWorker registration successful');
+          })
+          .catch(err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
       });
-    });
+    }
   </script>
 </body>
 </html>
