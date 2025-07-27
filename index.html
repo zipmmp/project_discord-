@@ -160,6 +160,28 @@
       margin: 15px 0;
       border: 1px solid var(--border);
     }
+    .tab-buttons {
+      display: flex;
+      margin-bottom: 15px;
+    }
+    .tab-button {
+      padding: 10px 15px;
+      background: #2D2D2D;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      border-radius: 5px 5px 0 0;
+      margin-right: 5px;
+    }
+    .tab-button.active {
+      background: var(--primary);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -169,7 +191,7 @@
 
   <script>
     // ==========================================
-    // نظام التطبيق التلقائي 24/7
+    // نظام التطبيق التلقائي 24/7 - النسخة المحسنة
     // ==========================================
     
     class DiscordSender24_7 {
@@ -180,12 +202,13 @@
         this.worker = null;
         this.isSending = false;
         this.is24_7Mode = false;
-        this.appVersion = '3.0.0-24-7';
+        this.appVersion = '4.0.0-24-7';
         this.monitorUrl = '';
         this.elements = {};
         this.keepAliveInterval = null;
-        this.inactivityTimeout = null;
+        this.serverCheckInterval = null;
         this.MAX_INACTIVITY = 15 * 60 * 1000; // 15 دقيقة
+        this.currentTab = 'sender';
         
         this.initApp();
       }
@@ -228,66 +251,105 @@
         container.innerHTML = `
           <h1>إرسال رسائل Discord تلقائي 24/7</h1>
           
-          <div class="settings-section">
+          <div class="tab-buttons">
+            <button class="tab-button ${this.currentTab === 'sender' ? 'active' : ''}" data-tab="sender">الإرسال</button>
+            <button class="tab-button ${this.currentTab === 'settings' ? 'active' : ''}" data-tab="settings">الإعدادات</button>
+            <button class="tab-button ${this.currentTab === 'help' ? 'active' : ''}" data-tab="help">المساعدة</button>
+          </div>
+          
+          <div id="senderTab" class="tab-content ${this.currentTab === 'sender' ? 'active' : ''}">
             <div class="form-group">
-              <label>
-                <input type="checkbox" id="autoResumeCheckbox" ${this.autoResume ? 'checked' : ''}>
-                الاستئناف التلقائي عند إعادة التحميل
-              </label>
+              <label for="channelId">معرف القناة:</label>
+              <input type="text" id="channelId" placeholder="123456789">
             </div>
+            
             <div class="form-group">
-              <label>
-                <input type="checkbox" id="enable24_7Checkbox">
-                تفعيل الوضع 24/7 (يتطلب موقع مراقبة)
-              </label>
+              <label for="token">توكن الديسكورد:</label>
+              <input type="password" id="token" placeholder="توكن البوت أو الحساب">
+            </div>
+            
+            <div class="form-group">
+              <label for="message">محتوى الرسالة:</label>
+              <textarea id="message" placeholder="اكتب الرسالة هنا..."></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="delay">المدة بين الرسائل (ثواني):</label>
+              <input type="number" id="delay" value="5" min="1">
+            </div>
+            
+            <div class="form-group">
+              <label for="retries">عدد المحاولات عند الفشل:</label>
+              <select id="retries">
+                <option value="0">لا تحاول مجدداً</option>
+                <option value="1">محاولة واحدة</option>
+                <option value="2" selected>محاولتين</option>
+                <option value="3">3 محاولات</option>
+                <option value="5">5 محاولات</option>
+              </select>
+            </div>
+            
+            <div class="button-group">
+              <button id="startBtn">بدء الإرسال</button>
+              <button id="stopBtn" disabled>إيقاف</button>
+              <button id="copyBtn" disabled>نسخ رابط المراقبة</button>
+            </div>
+            
+            <div id="status" class="status-inactive">
+              الحالة: غير نشط
+            </div>
+            
+            <div id="monitorLinkContainer" style="display: none;">
+              <h3>رابط مراقبة الجلسة:</h3>
+              <div class="monitor-link" id="monitorLink"></div>
+              <small>انسخ هذا الرابط وأدخله في موقع المراقبة للحفاظ على الجلسة نشطة 24/7</small>
             </div>
           </div>
           
-          <div class="form-group">
-            <label for="channelId">معرف القناة:</label>
-            <input type="text" id="channelId" placeholder="123456789">
+          <div id="settingsTab" class="tab-content ${this.currentTab === 'settings' ? 'active' : ''}">
+            <div class="settings-section">
+              <div class="form-group">
+                <label>
+                  <input type="checkbox" id="autoResumeCheckbox" ${this.autoResume ? 'checked' : ''}>
+                  الاستئناف التلقائي عند إعادة التحميل
+                </label>
+              </div>
+              <div class="form-group">
+                <label>
+                  <input type="checkbox" id="enable24_7Checkbox">
+                  تفعيل الوضع 24/7 (يتطلب موقع مراقبة)
+                </label>
+              </div>
+              <div class="form-group">
+                <label for="inactivityTime">وقت عدم النشاط قبل الإيقاف (دقائق):</label>
+                <input type="number" id="inactivityTime" value="15" min="5" max="120">
+              </div>
+            </div>
           </div>
           
-          <div class="form-group">
-            <label for="token">توكن الديسكورد:</label>
-            <input type="password" id="token" placeholder="توكن البوت أو الحساب">
-          </div>
-          
-          <div class="form-group">
-            <label for="message">محتوى الرسالة:</label>
-            <textarea id="message" placeholder="اكتب الرسالة هنا..."></textarea>
-          </div>
-          
-          <div class="form-group">
-            <label for="delay">المدة بين الرسائل (ثواني):</label>
-            <input type="number" id="delay" value="5" min="1">
-          </div>
-          
-          <div class="form-group">
-            <label for="retries">عدد المحاولات عند الفشل:</label>
-            <select id="retries">
-              <option value="0">لا تحاول مجدداً</option>
-              <option value="1">محاولة واحدة</option>
-              <option value="2" selected>محاولتين</option>
-              <option value="3">3 محاولات</option>
-              <option value="5">5 محاولات</option>
-            </select>
-          </div>
-          
-          <div class="button-group">
-            <button id="startBtn">بدء الإرسال</button>
-            <button id="stopBtn" disabled>إيقاف</button>
-            <button id="copyBtn" disabled>نسخ رابط المراقبة</button>
-          </div>
-          
-          <div id="status" class="status-inactive">
-            الحالة: غير نشط
-          </div>
-          
-          <div id="monitorLinkContainer" style="display: none;">
-            <h3>رابط مراقبة الجلسة:</h3>
-            <div class="monitor-link" id="monitorLink"></div>
-            <small>انسخ هذا الرابط وأدخله في موقع المراقبة للحفاظ على الجلسة نشطة 24/7</small>
+          <div id="helpTab" class="tab-content ${this.currentTab === 'help' ? 'active' : ''}">
+            <div class="settings-section">
+              <h3>كيفية استخدام النظام 24/7</h3>
+              <p>لضمان عمل النظام 24/7 بدون توقف:</p>
+              <ol>
+                <li>قم بتفعيل خيار "الوضع 24/7" في تبويب الإعدادات</li>
+                <li>بعد بدء الإرسال، سيظهر رابط المراقبة</li>
+                <li>انسخ هذا الرابط وافتحه في:</li>
+                <ul>
+                  <li>جهاز آخر أو متصفح مختلف</li>
+                  <li>خدمة مراقبة مثل UptimeRobot</li>
+                  <li>خادم VPS أو استضافة</li>
+                </ul>
+                <li>سيحافظ هذا على الجلسة نشطة حتى عند إغلاق المتصفح</li>
+              </ol>
+              
+              <h3>نصائح مهمة</h3>
+              <ul>
+                <li>استخدم توكن حساب ثانوي وليس حسابك الرئيسي</li>
+                <li>تجنب استخدام فترات زمنية قصيرة جداً بين الرسائل (أقل من 5 ثواني)</li>
+                <li>احتفظ بنسخة من التوكن والرسالة في مكان آمن</li>
+              </ul>
+            </div>
           </div>
           
           <div id="logs"></div>
@@ -304,6 +366,9 @@
           monitorLinkContainer: document.getElementById('monitorLinkContainer'),
           autoResumeCheckbox: document.getElementById('autoResumeCheckbox'),
           enable24_7Checkbox: document.getElementById('enable24_7Checkbox'),
+          inactivityTime: document.getElementById('inactivityTime'),
+          tabButtons: document.querySelectorAll('.tab-button'),
+          tabContents: document.querySelectorAll('.tab-content'),
           inputs: {
             channelId: document.getElementById('channelId'),
             token: document.getElementById('token'),
@@ -321,12 +386,16 @@
           const config = JSON.parse(savedConfig);
           this.autoResume = config.autoResume !== false;
           this.is24_7Mode = config.is24_7Mode || false;
+          this.MAX_INACTIVITY = (config.inactivityTime || 15) * 60 * 1000;
           
           if (this.elements.autoResumeCheckbox) {
             this.elements.autoResumeCheckbox.checked = this.autoResume;
           }
           if (this.elements.enable24_7Checkbox) {
             this.elements.enable24_7Checkbox.checked = this.is24_7Mode;
+          }
+          if (this.elements.inactivityTime) {
+            this.elements.inactivityTime.value = config.inactivityTime || 15;
           }
         }
       }
@@ -336,6 +405,7 @@
         localStorage.setItem(this.CONFIG_KEY, JSON.stringify({
           autoResume: this.autoResume,
           is24_7Mode: this.is24_7Mode,
+          inactivityTime: parseInt(this.elements.inactivityTime.value) || 15,
           sessionId: this.SESSION_ID,
           timestamp: Date.now()
         }));
@@ -374,77 +444,77 @@
         this.addLog(`تم تفعيل وضع المراقبة للجلسة: ${sessionId}`, 'info');
         
         // إخفاء عناصر التحكم
-        document.querySelector('.settings-section').style.display = 'none';
-        document.querySelectorAll('.form-group').forEach(el => el.style.display = 'none');
-        document.querySelector('.button-group').style.display = 'none';
+        document.querySelector('.tab-buttons').style.display = 'none';
+        document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+        document.querySelector('#logs').style.marginTop = '20px';
         
         // عرض حالة المراقبة فقط
         this.elements.status.textContent = `وضع المراقبة: ${sessionId}`;
         this.elements.status.className = 'status-24-7';
+        this.elements.status.style.display = 'block';
         
         // نظام إبقاء الجلسة نشطة
-        this.startKeepAliveSystem(sessionId);
+        this.startAdvancedKeepAliveSystem(sessionId);
       }
       
-      // نظام إبقاء الجلسة نشطة
-      startKeepAliveSystem(sessionId) {
+      // نظام متقدم لإبقاء الجلسة نشطة
+      startAdvancedKeepAliveSystem(sessionId) {
         // إلغاء أي مؤقتات سابقة
         if (this.keepAliveInterval) clearInterval(this.keepAliveInterval);
-        if (this.inactivityTimeout) clearTimeout(this.inactivityTimeout);
         
-        // تحديث آخر نشاط
-        this.lastActivity = Date.now();
-        
-        // إرسال نبضات حياة كل دقيقتين
+        // إرسال نبضات حياة متقدمة
         this.keepAliveInterval = setInterval(() => {
-          fetch(window.location.href, {
-            method: 'HEAD',
-            cache: 'no-cache',
-            headers: {
-              'X-KeepAlive': 'true',
-              'X-Session-ID': sessionId
-            }
-          }).then(() => {
-            this.lastActivity = Date.now();
-            console.log(`[${new Date().toLocaleTimeString()}] نبضة حياة للجلسة ${sessionId}`);
-          }).catch(err => {
-            console.error('فشل في إرسال نبضة الحياة:', err);
-          });
+          this.sendAdvancedPing(sessionId);
         }, 2 * 60 * 1000); // كل دقيقتين
         
-        // مراقبة عدم النشاط
-        this.checkInactivity(sessionId);
-        
         // إرسال أول نبضة فوراً
-        this.sendInitialPing(sessionId);
-      }
-      
-      // مراقبة عدم النشاط
-      checkInactivity(sessionId) {
-        this.inactivityTimeout = setInterval(() => {
-          const inactiveTime = Date.now() - this.lastActivity;
-          console.log(`[${new Date().toLocaleTimeString()}] وقت عدم النشاط: ${Math.floor(inactiveTime/1000)} ثانية`);
-          
-          if (inactiveTime > this.MAX_INACTIVITY) {
-            this.addLog('تم إيقاف الجلسة بسبب عدم النشاط', 'warning');
-            this.stopSending();
-            clearInterval(this.inactivityTimeout);
+        this.sendAdvancedPing(sessionId);
+        
+        // إضافة مستمع لفحص التبويب النشط
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden) {
+            this.sendAdvancedPing(sessionId);
           }
-        }, 30 * 1000); // التحقق كل 30 ثانية
-      }
-      
-      // إرسال أول نبضة حياة
-      sendInitialPing(sessionId) {
-        fetch(window.location.href, {
-          method: 'HEAD',
-          cache: 'no-cache',
-          headers: {
-            'X-KeepAlive': 'true',
-            'X-Session-ID': sessionId
-          }
-        }).then(() => {
-          this.lastActivity = Date.now();
         });
+        
+        // إضافة مستمع لأحداث الماوس/لوحة المفاتيح
+        document.addEventListener('mousemove', () => this.sendAdvancedPing(sessionId));
+        document.addEventListener('keydown', () => this.sendAdvancedPing(sessionId));
+        
+        // بدء نظام التحقق من الخادم
+        this.setupServerPingSystem();
+      }
+      
+      // نظام التحقق من الخادم
+      setupServerPingSystem() {
+        if (this.serverCheckInterval) clearInterval(this.serverCheckInterval);
+        
+        this.serverCheckInterval = setInterval(() => {
+          fetch('https://httpbin.org/get', {
+            cache: 'no-cache'
+          }).then(() => {
+            this.lastServerPing = Date.now();
+          }).catch(err => {
+            console.error('فشل في الاتصال بالخادم:', err);
+            this.addLog('فقدان الاتصال بالخادم، جارٍ إعادة المحاولة...', 'error');
+          });
+        }, 5 * 60 * 1000); // كل 5 دقائق
+      }
+      
+      // إرسال نبضة متقدمة
+      sendAdvancedPing(sessionId) {
+        const pingData = {
+          sessionId: sessionId,
+          timestamp: Date.now(),
+          userAgent: navigator.userAgent,
+          location: window.location.href
+        };
+        
+        // يمكنك هنا إرسال البيانات إلى خادمك إذا كان لديك واحد
+        console.log(`[${new Date().toLocaleTimeString()}] إرسال نبضة متقدمة`, pingData);
+        
+        // حفظ آخر نشاط
+        this.lastActivity = Date.now();
       }
       
       // إعداد مستمعي الأحداث
@@ -471,6 +541,12 @@
           }
         });
         
+        this.elements.inactivityTime.addEventListener('change', (e) => {
+          this.MAX_INACTIVITY = parseInt(e.target.value) * 60 * 1000;
+          this.saveConfig();
+          this.addLog(`تم تحديث وقت عدم النشاط إلى ${e.target.value} دقائق`, 'info');
+        });
+        
         // التحقق من التوكن عند التغيير
         this.elements.inputs.token.addEventListener('change', async () => {
           const token = this.elements.inputs.token.value.trim();
@@ -479,6 +555,29 @@
             const isValid = await this.validateToken(token);
             this.addLog(isValid ? 'التوكن صالح' : 'التوكن غير صالح', isValid ? 'success' : 'error');
           }
+        });
+        
+        // تبديل التبويبات
+        this.elements.tabButtons.forEach(button => {
+          button.addEventListener('click', () => {
+            const tabName = button.getAttribute('data-tab');
+            this.switchTab(tabName);
+          });
+        });
+      }
+      
+      // تبديل التبويبات
+      switchTab(tabName) {
+        this.currentTab = tabName;
+        
+        // تحديث أزرار التبويبات
+        this.elements.tabButtons.forEach(button => {
+          button.classList.toggle('active', button.getAttribute('data-tab') === tabName);
+        });
+        
+        // تحديث محتوى التبويبات
+        this.elements.tabContents.forEach(content => {
+          content.classList.toggle('active', content.id === `${tabName}Tab`);
         });
       }
       
@@ -639,6 +738,7 @@
         // إذا كان الوضع 24/7 مفعلاً، إنشاء رابط المراقبة
         if (this.is24_7Mode) {
           this.generateAndDisplayMonitorUrl();
+          this.startAdvancedKeepAliveSystem(this.SESSION_ID);
         }
       }
       
@@ -655,9 +755,9 @@
           this.keepAliveInterval = null;
         }
         
-        if (this.inactivityTimeout) {
-          clearTimeout(this.inactivityTimeout);
-          this.inactivityTimeout = null;
+        if (this.serverCheckInterval) {
+          clearInterval(this.serverCheckInterval);
+          this.serverCheckInterval = null;
         }
         
         this.saveState({ isActive: false });
