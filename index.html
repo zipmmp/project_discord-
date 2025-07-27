@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DISCORD SENDER PRO AUTO</title>
+  <title>DISCORD SENDER PRO 24/7</title>
   <style>
     :root {
       --primary: #5865F2;
@@ -76,6 +76,10 @@
       background: var(--danger);
       color: white;
     }
+    #copyBtn {
+      background: var(--success);
+      color: white;
+    }
     #logs {
       max-height: 300px;
       overflow-y: auto;
@@ -99,6 +103,9 @@
     .warning {
       color: var(--warning);
     }
+    .info {
+      color: var(--primary);
+    }
     #status {
       padding: 10px;
       text-align: center;
@@ -114,9 +121,17 @@
       background: rgba(237, 66, 69, 0.2);
       color: var(--danger);
     }
-    .auto-mode {
+    .status-24-7 {
       background: rgba(88, 101, 242, 0.2);
       color: var(--primary);
+      animation: pulse 2s infinite;
+    }
+    .monitor-link {
+      background: #252525;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      word-break: break-all;
     }
     .spinner {
       border: 3px solid rgba(255,255,255,0.1);
@@ -133,7 +148,12 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    .auto-settings {
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
+    .settings-section {
       background: #252525;
       padding: 15px;
       border-radius: 8px;
@@ -149,18 +169,21 @@
 
   <script>
     // ==========================================
-    // نظام التطبيق التلقائي بالكامل
+    // نظام التطبيق التلقائي 24/7
     // ==========================================
     
-    class AutoDiscordSender {
+    class DiscordSender24_7 {
       constructor() {
-        this.STATE_KEY = 'autoDiscordSenderState';
-        this.CONFIG_KEY = 'autoDiscordSenderConfig';
+        this.STATE_KEY = 'discordSender24_7State';
+        this.CONFIG_KEY = 'discordSender24_7Config';
+        this.SESSION_ID = this.generateSessionId();
         this.worker = null;
         this.isSending = false;
-        this.autoResume = true;
-        this.appVersion = '2.0.0-auto';
+        this.is24_7Mode = false;
+        this.appVersion = '3.0.0-24-7';
+        this.monitorUrl = '';
         this.elements = {};
+        this.keepAliveInterval = null;
         
         this.initApp();
       }
@@ -170,9 +193,12 @@
         this.createUI();
         this.loadConfig();
         this.setupEventListeners();
-        this.attemptAutoResume();
         
-        this.addLog(`تم تحميل DISCORD SENDER PRO AUTO الإصدار ${this.appVersion}`, 'info');
+        this.addLog(`تم تحميل DISCORD SENDER PRO 24/7 الإصدار ${this.appVersion}`, 'info');
+        this.addLog(`معرف الجلسة: ${this.SESSION_ID}`, 'info');
+        
+        // محاولة استئناف الجلسة التلقائي
+        this.attemptAutoResume();
       }
       
       // إنشاء واجهة المستخدم ديناميكياً
@@ -180,13 +206,19 @@
         const container = document.getElementById('appContainer');
         
         container.innerHTML = `
-          <h1>إرسال رسائل Discord تلقائي</h1>
+          <h1>إرسال رسائل Discord تلقائي 24/7</h1>
           
-          <div class="auto-settings">
+          <div class="settings-section">
             <div class="form-group">
               <label>
                 <input type="checkbox" id="autoResumeCheckbox" ${this.autoResume ? 'checked' : ''}>
-                الاستئناف التلقائي عند اكتشاف جلسة نشطة
+                الاستئناف التلقائي عند إعادة التحميل
+              </label>
+            </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="enable24_7Checkbox">
+                تفعيل الوضع 24/7 (يتطلب موقع مراقبة)
               </label>
             </div>
           </div>
@@ -225,10 +257,17 @@
           <div class="button-group">
             <button id="startBtn">بدء الإرسال</button>
             <button id="stopBtn" disabled>إيقاف</button>
+            <button id="copyBtn" disabled>نسخ رابط المراقبة</button>
           </div>
           
           <div id="status" class="status-inactive">
             الحالة: غير نشط
+          </div>
+          
+          <div id="monitorLinkContainer" style="display: none;">
+            <h3>رابط مراقبة الجلسة:</h3>
+            <div class="monitor-link" id="monitorLink"></div>
+            <small>انسخ هذا الرابط وأدخله في موقع المراقبة للحفاظ على الجلسة نشطة 24/7</small>
           </div>
           
           <div id="logs"></div>
@@ -238,9 +277,13 @@
         this.elements = {
           startBtn: document.getElementById('startBtn'),
           stopBtn: document.getElementById('stopBtn'),
+          copyBtn: document.getElementById('copyBtn'),
           status: document.getElementById('status'),
           logs: document.getElementById('logs'),
+          monitorLink: document.getElementById('monitorLink'),
+          monitorLinkContainer: document.getElementById('monitorLinkContainer'),
           autoResumeCheckbox: document.getElementById('autoResumeCheckbox'),
+          enable24_7Checkbox: document.getElementById('enable24_7Checkbox'),
           inputs: {
             channelId: document.getElementById('channelId'),
             token: document.getElementById('token'),
@@ -251,15 +294,30 @@
         };
       }
       
+      // توليد معرف جلسة فريد
+      generateSessionId() {
+        return 'session-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      }
+      
+      // إنشاء رابط مراقبة فريد
+      generateMonitorUrl() {
+        const baseUrl = window.location.href.split('?')[0];
+        return `${baseUrl}?monitor=${this.SESSION_ID}`;
+      }
+      
       // تحميل الإعدادات
       loadConfig() {
         const savedConfig = localStorage.getItem(this.CONFIG_KEY);
         if (savedConfig) {
           const config = JSON.parse(savedConfig);
           this.autoResume = config.autoResume !== false; // true by default
+          this.is24_7Mode = config.is24_7Mode || false;
           
           if (this.elements.autoResumeCheckbox) {
             this.elements.autoResumeCheckbox.checked = this.autoResume;
+          }
+          if (this.elements.enable24_7Checkbox) {
+            this.elements.enable24_7Checkbox.checked = this.is24_7Mode;
           }
         }
       }
@@ -268,11 +326,13 @@
       saveConfig() {
         localStorage.setItem(this.CONFIG_KEY, JSON.stringify({
           autoResume: this.autoResume,
+          is24_7Mode: this.is24_7Mode,
+          sessionId: this.SESSION_ID,
           timestamp: Date.now()
         }));
       }
       
-      // محاولة الاستئناف التلقائي
+      // محاولة استئناف الجلسة التلقائي
       attemptAutoResume() {
         const state = this.loadState();
         if (state && state.isActive) {
@@ -298,17 +358,78 @@
             }, 1500);
           }
         }
+        
+        // التحقق من وضع المراقبة في URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const monitorSession = urlParams.get('monitor');
+        if (monitorSession) {
+          this.addLog(`وضع المراقبة للجلسة: ${monitorSession}`, 'info');
+          this.activateMonitorMode(monitorSession);
+        }
+      }
+      
+      // تفعيل وضع المراقبة
+      activateMonitorMode(sessionId) {
+        this.addLog('جارٍ تفعيل وضع المراقبة 24/7...', 'info');
+        
+        // إخفاء عناصر التحكم
+        document.querySelector('.settings-section').style.display = 'none';
+        document.querySelectorAll('.form-group').forEach(el => el.style.display = 'none');
+        document.querySelector('.button-group').style.display = 'none';
+        
+        // عرض حالة المراقبة فقط
+        this.elements.status.textContent = `وضع المراقبة للجلسة: ${sessionId}`;
+        this.elements.status.className = 'status-24-7';
+        
+        // نظام إبقاء الجلسة نشطة
+        this.keepSessionAlive(sessionId);
+      }
+      
+      // نظام إبقاء الجلسة نشطة
+      keepSessionAlive(sessionId) {
+        // إرسال نبضات حياة كل 30 ثانية
+        this.keepAliveInterval = setInterval(() => {
+          fetch(window.location.href, {
+            method: 'HEAD',
+            cache: 'no-cache'
+          }).then(() => {
+            console.log(`نبضة حياة للجلسة ${sessionId} - ${new Date().toLocaleTimeString()}`);
+          }).catch(err => {
+            console.error('فشل في إرسال نبضة الحياة:', err);
+          });
+        }, 30000);
+        
+        // إرسال أول نبضة فوراً
+        setTimeout(() => {
+          fetch(window.location.href, {
+            method: 'HEAD',
+            cache: 'no-cache'
+          });
+        }, 1000);
       }
       
       // إعداد مستمعي الأحداث
       setupEventListeners() {
         this.elements.startBtn.addEventListener('click', () => this.startSending());
         this.elements.stopBtn.addEventListener('click', () => this.stopSending());
+        this.elements.copyBtn.addEventListener('click', () => this.copyMonitorUrl());
         
         this.elements.autoResumeCheckbox.addEventListener('change', (e) => {
           this.autoResume = e.target.checked;
           this.saveConfig();
-          this.addLog(`تم ${this.autoResume ? 'تفعيل' : 'تعطيل'} وضع الاستئناف التلقائي`, 'info');
+          this.addLog(`تم ${this.autoResume ? 'تفعيل' : 'تعطيل'} الاستئناف التلقائي`, 'info');
+        });
+        
+        this.elements.enable24_7Checkbox.addEventListener('change', (e) => {
+          this.is24_7Mode = e.target.checked;
+          this.saveConfig();
+          this.addLog(`تم ${this.is24_7Mode ? 'تفعيل' : 'تعطيل'} الوضع 24/7`, 'info');
+          
+          if (this.is24_7Mode && this.isSending) {
+            this.generateAndDisplayMonitorUrl();
+          } else {
+            this.elements.monitorLinkContainer.style.display = 'none';
+          }
         });
         
         // التحقق من التوكن عند التغيير
@@ -320,6 +441,26 @@
             this.addLog(isValid ? 'التوكن صالح' : 'التوكن غير صالح', isValid ? 'success' : 'error');
           }
         });
+      }
+      
+      // نسخ رابط المراقبة
+      copyMonitorUrl() {
+        navigator.clipboard.writeText(this.monitorUrl).then(() => {
+          this.addLog('تم نسخ رابط المراقبة إلى الحافظة', 'success');
+        }).catch(err => {
+          this.addLog('فشل في نسخ الرابط: ' + err, 'error');
+        });
+      }
+      
+      // عرض رابط المراقبة
+      generateAndDisplayMonitorUrl() {
+        this.monitorUrl = this.generateMonitorUrl();
+        this.elements.monitorLink.textContent = this.monitorUrl;
+        this.elements.monitorLinkContainer.style.display = 'block';
+        this.elements.copyBtn.disabled = false;
+        
+        this.addLog('تم إنشاء رابط المراقبة 24/7', 'info');
+        this.addLog(`انسخ هذا الرابط وأدخله في موقع المراقبة: ${this.monitorUrl}`, 'info');
       }
       
       // ==========================================
@@ -452,11 +593,17 @@
           message: message.value.trim(),
           delay: delay.value,
           retries: retries.value,
-          isActive: true
+          isActive: true,
+          sessionId: this.SESSION_ID
         });
         
         this.updateUI(true);
         this.addLog('بدأ الإرسال التلقائي', 'success');
+        
+        // إذا كان الوضع 24/7 مفعلاً، إنشاء رابط المراقبة
+        if (this.is24_7Mode) {
+          this.generateAndDisplayMonitorUrl();
+        }
       }
       
       stopSending() {
@@ -466,8 +613,14 @@
           this.worker = null;
         }
         
+        if (this.keepAliveInterval) {
+          clearInterval(this.keepAliveInterval);
+          this.keepAliveInterval = null;
+        }
+        
         this.saveState({ isActive: false });
         this.updateUI(false);
+        this.elements.monitorLinkContainer.style.display = 'none';
         this.addLog('تم إيقاف الإرسال', 'warning');
       }
       
@@ -478,7 +631,8 @@
       saveState(data) {
         localStorage.setItem(this.STATE_KEY, JSON.stringify({
           ...data,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          sessionId: this.SESSION_ID
         }));
       }
       
@@ -529,7 +683,7 @@
     
     // بدء التطبيق عند تحميل الصفحة
     document.addEventListener('DOMContentLoaded', () => {
-      new AutoDiscordSender();
+      new DiscordSender24_7();
     });
   </script>
 </body>
